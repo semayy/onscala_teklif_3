@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="tr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OnScala KKK Projesi - 2026 Dijital Dönüşüm Teklifi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            bg: '#030712', // Ultra dark background
+                            surface: 'rgba(17, 24, 39, 0.4)',
+                            primary: '#3b82f6', // Bright Blue
+                            secondary: '#06b6d4', // Cyan
+                            accent: '#8b5cf6', // Purple
+                            glow: 'rgba(59, 130, 246, 0.5)'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Outfit"', 'sans-serif'],
+                        display: ['"Space Grotesk"', 'sans-serif'],
+                    },
+                    backgroundImage: {
+                        'cyber-gradient': 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #06b6d4 100%)',
+                        'glass-gradient': 'linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%)',
+                    },
+                    animation: {
+                        'float-slow': 'float 8s ease-in-out infinite',
+                        'float-fast': 'float 4s ease-in-out infinite',
+                        'pulse-glow': 'pulseGlow 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'spin-slow': 'spin 15s linear infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0) scale(1)' },
+                            '50%': { transform: 'translateY(-20px) scale(1.02)' },
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { opacity: 0.5, transform: 'scale(1)' },
+                            '50%': { opacity: 0.8, transform: 'scale(1.1)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { 
+            background-color: #030712; 
+            color: #f3f4f6;
+            overflow-x: hidden;
+        }
+
+        /* 2026 Next-Gen Glassmorphism */
+        .glass-2026 {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.005) 100%);
+            backdrop-filter: blur(32px);
+            -webkit-backdrop-filter: blur(32px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 30px 60px -10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            border-radius: 28px;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+            z-index: 10;
+        }
+
+        .glass-2026:hover {
+            transform: translateY(-8px);
+            border-color: rgba(59, 130, 246, 0.3);
+            box-shadow: 0 40px 80px -15px rgba(0, 0, 0, 0.6), 0 0 40px rgba(59, 130, 246, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        /* Glowing text effect */
+        .text-glow {
+            text-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+        }
+
+        /* Gradient text */
+        .text-gradient {
+            background: linear-gradient(to right, #60a5fa, #c084fc, #22d3ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Background grid with perspective */
+        .bg-grid-3d {
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            transform: perspective(500px) rotateX(60deg) translateY(-100px) translateZ(-200px);
+            transform-origin: top;
+            width: 200%;
+            height: 200%;
+            position: absolute;
+            top: 0;
+            left: -50%;
+            z-index: -2;
+            mask-image: linear-gradient(to bottom, black 20%, transparent 80%);
+            -webkit-mask-image: linear-gradient(to bottom, black 20%, transparent 80%);
+        }
+
+        /* Scroll Reveal Utility */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #030712; }
+        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3b82f6; }
+        
+        @media print {
+            .no-print { display: none; }
+            body { background: white; color: black; }
+            .glass-2026 { box-shadow: none; border: 1px solid #e5e7eb; background: white; filter: none; backdrop-filter: none; color: black;}
+            .text-gradient { background: none; -webkit-text-fill-color: black; color: black; }
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-brand-primary selection:text-white">
+
+    <!-- Ambient Background Effects -->
+    <div class="fixed inset-0 z-[-1] overflow-hidden pointer-events-none">
+        <div class="bg-grid-3d"></div>
+        <!-- Moving Orbs -->
+        <div class="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] rounded-full bg-brand-primary/15 blur-[120px] animate-pulse-glow"></div>
+        <div class="absolute top-[40%] right-[-10%] w-[40vw] h-[40vw] max-w-[500px] max-h-[500px] rounded-full bg-brand-accent/15 blur-[100px] animate-pulse-glow" style="animation-delay: 2s;"></div>
+        <div class="absolute bottom-[-20%] left-[20%] w-[60vw] h-[60vw] max-w-[700px] max-h-[700px] rounded-full bg-brand-secondary/10 blur-[130px] animate-pulse-glow" style="animation-delay: 4s;"></div>
+    </div>
+
+    <!-- Ultra-modern Floating Navbar -->
+    <header class="fixed top-6 left-0 right-0 z-50 px-4 transition-all duration-300 no-print flex justify-center">
+        <div class="glass-2026 !rounded-full px-6 py-3 flex justify-between items-center w-full max-w-5xl">
+            <!-- Logo -->
+            <a href="#" class="flex items-center relative group">
+                <div class="absolute inset-0 bg-white/20 blur-md rounded-full scale-150 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <span class="text-xl md:text-2xl font-display font-bold text-white relative z-10 tracking-wide">OnScala <span class="text-brand-secondary font-medium">Teklif</span></span>
+            </a>
+            
+            <!-- Desktop Menu -->
+            <nav class="hidden md:flex space-x-8 text-sm font-medium text-gray-300">
+                <a href="#kapsam" class="hover:text-white hover:text-shadow-sm transition-all">KKK Ekosistemi</a>
+                <a href="#dijital" class="hover:text-white hover:text-shadow-sm transition-all">Dijital Varlık</a>
+                <a href="#tedarik" class="hover:text-white hover:text-shadow-sm transition-all">Tasarım Mimarisi</a>
+                <a href="#prensipler" class="hover:text-white hover:text-shadow-sm transition-all hidden lg:block">Prensipler & Takvim</a>
+            </nav>
+
+            <!-- Action Button -->
+            <a href="https://wa.me/905079448462" target="_blank" class="relative group overflow-hidden rounded-full p-[1px]">
+                <span class="absolute inset-0 bg-cyber-gradient animate-spin-slow opacity-70 group-hover:opacity-100"></span>
+                <div class="relative bg-brand-bg/80 backdrop-blur-xl px-5 py-2 md:py-2.5 rounded-full text-sm font-semibold text-white flex items-center gap-2 transition-all group-hover:bg-transparent">
+                    <i class="fab fa-whatsapp text-green-400"></i>
+                    <span class="hidden sm:inline">Aksiyon Al</span>
+                </div>
+            </a>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-32 md:py-48 space-y-32">
+        
+        <!-- Hero Section -->
+        <section class="relative z-10 flex flex-col lg:flex-row items-center justify-between min-h-[60vh] gap-12">
+            
+            <!-- Left Content -->
+            <div class="w-full lg:w-3/5 space-y-8 text-center lg:text-left reveal active">
+                <div class="inline-flex items-center gap-2 glass-2026 !rounded-full px-5 py-2.5 text-xs md:text-sm font-medium mb-2 border border-white/10 text-gray-200">
+                    <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+                    Kurumsal İvme Programı
+                </div>
+                
+                <h1 class="text-5xl md:text-7xl lg:text-[5.5rem] font-display font-bold leading-[1.1] tracking-tight text-white">
+                    OnScala'yı <br/>
+                    <span class="text-gradient">Geleceğe</span> Taşıyın.
+                </h1>
+                
+                <p class="text-lg md:text-xl text-gray-400 max-w-2xl font-light leading-relaxed mx-auto lg:mx-0">
+                    A'dan Z'ye tasarlanmış "KKK Komple Set" ile OnScala markasının global standartlarda dijital ve fiziksel ekosistemini inşa ediyoruz. Sınırları aşmaya hazırlanın.
+                </p>
+
+                <div class="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start pt-4">
+                    <a href="#fiyatlandirma" class="w-full sm:w-auto px-8 py-4 rounded-full bg-white text-black font-bold hover:scale-105 transition-transform flex items-center justify-center gap-2">
+                        Teklifi İncele <i class="fas fa-arrow-down"></i>
+                    </a>
+                    <div class="text-sm text-gray-500 font-light flex items-center gap-2">
+                        <i class="fas fa-shield-alt text-brand-primary"></i> Kurumsal Güvence
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Visual (Jet) -->
+            <div class="w-full lg:w-2/5 relative flex justify-center items-center h-[300px] md:h-[500px] z-10 pointer-events-none reveal active">
+                <!-- Portal Effect -->
+                <div class="absolute inset-0 bg-brand-primary/20 blur-[100px] rounded-full mix-blend-screen animate-pulse-glow"></div>
+                <div class="absolute inset-10 border border-brand-secondary/30 rounded-full animate-spin-slow" style="animation-duration: 20s; border-style: dashed;"></div>
+                
+                <!-- Floating Jet -->
+                <img src="https://png.pngtree.com/png-vector/20240208/ourmid/pngtree-f-16-fighter-jet-aircraft-aviation-and-air-force-plane-airplane-png-image_11730861.png" 
+                     alt="F-16 Tech Jet" 
+                     class="w-[120%] max-w-[600px] object-contain drop-shadow-[0_30px_60px_rgba(59,130,246,0.5)] animate-float-slow transform -rotate-12">
+            </div>
+        </section>
+
+        <!-- KKK Projesi Kapsamı -->
+        <section id="kapsam" class="pt-10 reveal">
+            <div class="text-center space-y-4 mb-16">
+                <h2 class="text-4xl md:text-5xl font-display font-bold text-white text-glow">Fiziksel & Dijital Ekosistem</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto text-lg font-light">Sadece bir web sitesi değil; markanızın tüm temas noktalarını kapsayan bütünleşik kurumsal mimari.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 relative">
+                <!-- Glow behind grid -->
+                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-brand-accent/5 blur-[120px] -z-10 rounded-full"></div>
+
+                <!-- Card 1 -->
+                <div class="glass-2026 p-8 group">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-white/10 flex items-center justify-center text-xl text-blue-400 mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-camera-retro"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4 font-display">İçerik & İmaj</h3>
+                    <ul class="space-y-3 text-gray-400 font-light text-sm md:text-base">
+                        <li class="flex items-start gap-3"><span class="text-brand-secondary mt-1"><i class="fas fa-circle text-[8px]"></i></span> Profesyonel Fotoğraf İstemi (Akif)</li>
+                        <li class="flex items-start gap-3"><span class="text-brand-secondary mt-1"><i class="fas fa-circle text-[8px]"></i></span> Hakkımızda & Kavramsal Sınırlılıklar Metinleri</li>
+                    </ul>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="glass-2026 p-8 group">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border border-white/10 flex items-center justify-center text-xl text-cyan-400 mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-network-wired"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4 font-display">Ağ & İletişim</h3>
+                    <ul class="space-y-3 text-gray-400 font-light text-sm md:text-base">
+                        <li class="flex items-start gap-3"><span class="text-brand-primary mt-1"><i class="fas fa-circle text-[8px]"></i></span> Business Hattı & İletişim Mimarisi</li>
+                        <li class="flex items-start gap-3"><span class="text-brand-primary mt-1"><i class="fas fa-circle text-[8px]"></i></span> Facebook, Instagram, LinkedIn Kurulumu</li>
+                        <li class="flex items-start gap-3"><span class="text-brand-primary mt-1"><i class="fas fa-circle text-[8px]"></i></span> Yeni Nesil NFC Kartvizit Teknolojisi</li>
+                    </ul>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="glass-2026 p-8 group md:col-span-2 lg:col-span-1">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-white/10 flex items-center justify-center text-xl text-purple-400 mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4 font-display">Kurumsal Materyal</h3>
+                    <ul class="space-y-3 text-gray-400 font-light text-sm md:text-base">
+                        <li class="flex items-start gap-3"><span class="text-brand-accent mt-1"><i class="fas fa-circle text-[8px]"></i></span> Premium Dijital ve Basılı Katalog</li>
+                        <li class="flex items-start gap-3"><span class="text-brand-accent mt-1"><i class="fas fa-circle text-[8px]"></i></span> İnteraktif Mobil Broşür Formatı</li>
+                        <li class="flex items-start gap-3"><span class="text-brand-accent mt-1"><i class="fas fa-circle text-[8px]"></i></span> Markaya Özel Teklif Formu Tasarımı</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Web Sitesi & Kurumsal Kimlik (Yatırım Detayları) -->
+        <section id="dijital" class="pt-10 reveal">
+            <div class="grid lg:grid-cols-2 gap-8 md:gap-12">
+                
+                <!-- Web & SEO Bütçesi -->
+                <div class="glass-2026 p-8 md:p-12 relative overflow-hidden flex flex-col justify-between">
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 rounded-full blur-[80px] -z-10 pointer-events-none"></div>
+                    
+                    <div>
+                        <div class="inline-block px-4 py-1.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 text-sm font-semibold mb-6">
+                            Web & SEO Mimarisi
+                        </div>
+                        <h3 class="text-3xl md:text-4xl font-display font-bold text-white mb-6">Sınır Tanımayan <br>Dijital Merkez.</h3>
+                        <p class="text-gray-400 font-light mb-8">viapia.com.tr emsalinde, dünya standartlarında hıza ve teknolojiye sahip, arama motorlarını domine edecek çok dilli kurumsal altyapı.</p>
+                        
+                        <div class="space-y-4 mb-10">
+                            <div class="glass-2026 !rounded-xl !p-4 !border-white/5 flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-cyan-400"><i class="fas fa-globe"></i></div>
+                                <div>
+                                    <div class="text-white font-semibold">Çok Dilli Altyapı</div>
+                                    <div class="text-xs text-gray-500">ENG, TR ve GEO entegrasyonu</div>
+                                </div>
+                            </div>
+                            <div class="glass-2026 !rounded-xl !p-4 !border-white/5 flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-cyan-400"><i class="fas fa-robot"></i></div>
+                                <div>
+                                    <div class="text-white font-semibold">Yapay Zeka & SEO</div>
+                                    <div class="text-xs text-gray-500">JSON-LD yapısı + 10 Adet AI Destekli Sektörel Makale</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-8 border-t border-white/10 flex justify-between items-end">
+                        <div>
+                            <div class="text-sm text-gray-500 mb-1">Teslimat: 30 İş Günü</div>
+                            <div class="text-4xl md:text-5xl font-bold text-white">45.000 <span class="text-xl text-gray-500 font-normal">TL</span></div>
+                        </div>
+                        <div class="text-xs text-cyan-400/50">+ KDV</div>
+                    </div>
+                </div>
+
+                <!-- Kurumsal Kimlik Bütçesi -->
+                <div class="glass-2026 p-8 md:p-12 relative overflow-hidden flex flex-col justify-between">
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-[80px] -z-10 pointer-events-none"></div>
+                    
+                    <div>
+                        <div class="inline-block px-4 py-1.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 text-sm font-semibold mb-6">
+                            Marka Kimliği
+                        </div>
+                        <h3 class="text-3xl md:text-4xl font-display font-bold text-white mb-6">Akılda Kalıcı <br>Kusursuz İmaj.</h3>
+                        <p class="text-gray-400 font-light mb-8">OnScala'nın karakterini yansıtan, tüm dijital ve basılı medyalara uyarlanabilir premium görsel kimlik seti.</p>
+                        
+                        <div class="space-y-4 mb-10">
+                            <div class="glass-2026 !rounded-xl !p-4 !border-white/5 flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-blue-400"><i class="fas fa-bezier-curve"></i></div>
+                                <div>
+                                    <div class="text-white font-semibold">Vektörel Logo</div>
+                                    <div class="text-xs text-gray-500">Çoklu kullanım formatları ve kılavuzu</div>
+                                </div>
+                            </div>
+                            <div class="glass-2026 !rounded-xl !p-4 !border-white/5 flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-blue-400"><i class="fas fa-swatchbook"></i></div>
+                                <div>
+                                    <div class="text-white font-semibold">Kimlik Kiti</div>
+                                    <div class="text-xs text-gray-500">Antetli kağıt, zarf, dosya, fatura şablonları</div>
+                                </div>
+                            </div>
+                            <div class="glass-2026 !rounded-xl !p-4 !border-white/5 flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-blue-400"><i class="fas fa-envelope-open-text"></i></div>
+                                <div>
+                                    <div class="text-white font-semibold">Kurumsal İletişim</div>
+                                    <div class="text-xs text-gray-500">info@ mail kurulumları ve HTML mail imzaları</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-8 border-t border-white/10 flex justify-between items-end">
+                        <div>
+                            <div class="text-sm text-gray-500 mb-1">Kurumsal Logo & Kit</div>
+                            <div class="text-4xl md:text-5xl font-bold text-white">15.000 <span class="text-xl text-gray-500 font-normal">TL</span></div>
+                        </div>
+                        <div class="text-xs text-blue-400/50">+ KDV</div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Tedarik Tasarım Mimarisi -->
+        <section id="tedarik" class="pt-10 reveal">
+            <div class="text-center space-y-4 mb-16">
+                <h2 class="text-4xl md:text-5xl font-display font-bold text-white text-glow">Tedarik Zinciri Tasarımları</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto text-lg font-light">Ürün sunumlarınıza ve paketlemenize değer katacak ölçeklenebilir tasarım hizmetleri.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6 md:gap-8">
+                
+                <!-- Tier 1 -->
+                <div class="glass-2026 p-8 flex flex-col justify-between hover:-translate-y-2 transition-transform duration-300">
+                    <div>
+                        <div class="text-gray-500 text-sm font-bold uppercase tracking-widest mb-4">Seviye 1</div>
+                        <h4 class="text-2xl font-bold text-white mb-4">Basit İçerikler</h4>
+                        <p class="text-gray-400 font-light text-sm mb-8">Vektörel tabanlı temel grafik düzenlemeleri, standart görsel materyaller ve sosyal medya adaptasyonları.</p>
+                    </div>
+                    <div>
+                        <div class="text-3xl font-bold text-white mb-1">1.500 <span class="text-base text-gray-500 font-normal">TL</span></div>
+                        <div class="text-xs text-gray-600">Adet Başına (+KDV)</div>
+                    </div>
+                </div>
+
+                <!-- Tier 2 (Highlighted) -->
+                <div class="glass-2026 p-8 flex flex-col justify-between relative transform md:-translate-y-4 shadow-[0_0_40px_rgba(59,130,246,0.15)] !border-brand-primary/30">
+                    <div class="absolute inset-0 bg-gradient-to-b from-brand-primary/10 to-transparent rounded-3xl pointer-events-none"></div>
+                    <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-primary text-white text-[10px] font-bold px-4 py-1.5 rounded-full uppercase tracking-wider shadow-[0_0_15px_rgba(59,130,246,0.5)]">
+                        Önerilen
+                    </div>
+                    
+                    <div class="relative z-10">
+                        <div class="text-brand-primary text-sm font-bold uppercase tracking-widest mb-4 mt-2">Seviye 2</div>
+                        <h4 class="text-2xl font-bold text-white mb-4">Özelleştirilmiş</h4>
+                        <p class="text-gray-300 font-light text-sm mb-8">Markaya özel hazırlanmış, spesifik konsept tasarım çalışmaları ve detaylı vektörel illüstrasyonlar.</p>
+                    </div>
+                    <div class="relative z-10">
+                        <div class="text-4xl font-bold text-gradient mb-1">2.500 <span class="text-base text-gray-400 font-normal">TL</span></div>
+                        <div class="text-xs text-brand-primary/70">Adet Başına (+KDV)</div>
+                    </div>
+                </div>
+
+                <!-- Tier 3 -->
+                <div class="glass-2026 p-8 flex flex-col justify-between hover:-translate-y-2 transition-transform duration-300">
+                    <div>
+                        <div class="text-brand-accent text-sm font-bold uppercase tracking-widest mb-4">Seviye 3</div>
+                        <h4 class="text-2xl font-bold text-white mb-4">Kapsamlı</h4>
+                        <p class="text-gray-400 font-light text-sm mb-8">Kutu, ambalaj, stant ve çoklu yüzeye sahip detaylı endüstriyel grafik tasarım mimarisi.</p>
+                    </div>
+                    <div>
+                        <div class="text-3xl font-bold text-white mb-1">5.000 <span class="text-base text-gray-500 font-normal">TL</span></div>
+                        <div class="text-xs text-gray-600">Adet Başına (+KDV)</div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Çalışma Prensipleri & Sorumluluklar -->
+        <section id="prensipler" class="pt-20 reveal">
+            <div class="text-center space-y-4 mb-16">
+                <h2 class="text-4xl md:text-5xl font-display font-bold text-white text-glow">Çalışma Prensipleri</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto text-lg font-light">Kusursuz bir proje yönetimi için belirlediğimiz temel sorumluluk ve işleyiş kuralları.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Prensip 1: Görseller (Müşteri) -->
+                <div class="glass-2026 p-8 flex items-start gap-6 border-l-2 border-l-brand-secondary">
+                    <div class="w-12 h-12 shrink-0 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-400 text-xl"><i class="fas fa-images"></i></div>
+                    <div>
+                        <h4 class="text-xl font-bold text-white mb-2">Görsel Tedariği (OnScala)</h4>
+                        <p class="text-gray-400 font-light text-sm">Tasarım, web ve sosyal medya süreçlerinde kullanılacak tüm ham görseller, ürün fotoğrafları ve videolar <strong>OnScala ekibi tarafından sağlanacaktır.</strong> (Ajansımız, sağlanan bu ham materyalleri tasarımlara uygun olarak işler ve optimize eder).</p>
+                    </div>
+                </div>
+
+                <!-- Prensip 2: İçerik -->
+                <div class="glass-2026 p-8 flex items-start gap-6 border-l-2 border-l-brand-primary">
+                    <div class="w-12 h-12 shrink-0 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 text-xl"><i class="fas fa-file-signature"></i></div>
+                    <div>
+                        <h4 class="text-xl font-bold text-white mb-2">Onay ve Revizyon Süreçleri</h4>
+                        <p class="text-gray-400 font-light text-sm">Teslim edilen her modül (Web, Logo, Katalog vb.) için standart 2 tur minör revizyon hakkı bulunmaktadır. Projenin ilerleyişi, karşılıklı adım adım onay mekanizmalarıyla hız kesmeden sağlanır.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Proje Takvimi (30 Gün) -->
+        <section id="takvim" class="pt-20 reveal">
+            <div class="text-center space-y-4 mb-16">
+                <h2 class="text-4xl md:text-5xl font-display font-bold text-white text-glow">30 Günlük Aksiyon Planı</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto text-lg font-light">Projenin başlama vuruşundan tamamen yayına alınmasına kadar geçen sürenin yol haritası.</p>
+            </div>
+
+            <div class="relative max-w-4xl mx-auto mt-12">
+                <!-- Orta Çizgi (Line) -->
+                <div class="absolute left-[28px] md:left-1/2 md:-translate-x-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-brand-primary via-brand-secondary to-transparent"></div>
+
+                <div class="space-y-12">
+                    <!-- Hafta 1 -->
+                    <div class="relative flex flex-col md:flex-row items-start md:items-center md:justify-between group">
+                        <div class="absolute left-[28px] md:left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-brand-bg border-2 border-brand-primary group-hover:bg-brand-primary group-hover:shadow-[0_0_15px_rgba(59,130,246,0.8)] transition-all z-10"></div>
+                        <div class="ml-16 md:ml-0 md:w-[45%] md:text-right md:pr-12">
+                            <h4 class="text-2xl font-bold text-white">1. Hafta: Keşif & Mimari</h4>
+                        </div>
+                        <div class="ml-16 md:ml-0 md:w-[45%] md:pl-12 mt-2 md:mt-0">
+                            <div class="glass-2026 p-6 border-t-2 border-t-brand-primary/50">
+                                <ul class="text-sm text-gray-400 font-light space-y-2">
+                                    <li><i class="fas fa-check text-brand-primary mr-2"></i> OnScala'dan görsel/materyal transferi</li>
+                                    <li><i class="fas fa-check text-brand-primary mr-2"></i> Logo ve kurumsal kimlik eskizleri</li>
+                                    <li><i class="fas fa-check text-brand-primary mr-2"></i> Web domain, hosting ve kurumsal mail kurulumları</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hafta 2 -->
+                    <div class="relative flex flex-col md:flex-row items-start md:items-center md:justify-between group md:flex-row-reverse">
+                        <div class="absolute left-[28px] md:left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-brand-bg border-2 border-brand-secondary group-hover:bg-brand-secondary group-hover:shadow-[0_0_15px_rgba(6,182,212,0.8)] transition-all z-10"></div>
+                        <div class="ml-16 md:ml-0 md:w-[45%] md:text-left md:pl-12">
+                            <h4 class="text-2xl font-bold text-white">2. Hafta: Tasarım & UI</h4>
+                        </div>
+                        <div class="ml-16 md:ml-0 md:w-[45%] md:pr-12 mt-2 md:mt-0 md:text-right">
+                            <div class="glass-2026 p-6 border-t-2 border-t-brand-secondary/50">
+                                <ul class="text-sm text-gray-400 font-light space-y-2">
+                                    <li>Katalog ve broşür ana taslakları <i class="fas fa-check text-brand-secondary ml-2"></i></li>
+                                    <li>Web sitesi arayüz (UI) tasarımı <i class="fas fa-check text-brand-secondary ml-2"></i></li>
+                                    <li>Kurumsal mail imzalarının entegrasyonu <i class="fas fa-check text-brand-secondary ml-2"></i></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hafta 3 -->
+                    <div class="relative flex flex-col md:flex-row items-start md:items-center md:justify-between group">
+                        <div class="absolute left-[28px] md:left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-brand-bg border-2 border-brand-accent group-hover:bg-brand-accent group-hover:shadow-[0_0_15px_rgba(139,92,246,0.8)] transition-all z-10"></div>
+                        <div class="ml-16 md:ml-0 md:w-[45%] md:text-right md:pr-12">
+                            <h4 class="text-2xl font-bold text-white">3. Hafta: Kodlama & Geliştirme</h4>
+                        </div>
+                        <div class="ml-16 md:ml-0 md:w-[45%] md:pl-12 mt-2 md:mt-0">
+                            <div class="glass-2026 p-6 border-t-2 border-t-brand-accent/50">
+                                <ul class="text-sm text-gray-400 font-light space-y-2">
+                                    <li><i class="fas fa-check text-brand-accent mr-2"></i> Web sitesi altyapı kodlaması</li>
+                                    <li><i class="fas fa-check text-brand-accent mr-2"></i> Çok dilli yapının (TR/EN/GEO) inşası</li>
+                                    <li><i class="fas fa-check text-brand-accent mr-2"></i> AI destekli sektörel SEO makalelerinin yazımı</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hafta 4 -->
+                    <div class="relative flex flex-col md:flex-row items-start md:items-center md:justify-between group md:flex-row-reverse">
+                        <div class="absolute left-[28px] md:left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-brand-bg border-2 border-green-400 group-hover:bg-green-400 group-hover:shadow-[0_0_15px_rgba(74,222,128,0.8)] transition-all z-10"></div>
+                        <div class="ml-16 md:ml-0 md:w-[45%] md:text-left md:pl-12">
+                            <h4 class="text-2xl font-bold text-white">4. Hafta: Test & Teslimat</h4>
+                        </div>
+                        <div class="ml-16 md:ml-0 md:w-[45%] md:pr-12 mt-2 md:mt-0 md:text-right">
+                            <div class="glass-2026 p-6 border-t-2 border-t-green-400/50 shadow-[0_0_20px_rgba(74,222,128,0.1)]">
+                                <ul class="text-sm text-gray-400 font-light space-y-2">
+                                    <li>Sosyal medya ve iletişim ağlarının testi <i class="fas fa-check text-green-400 ml-2"></i></li>
+                                    <li>Son revizyonların uygulanması ve eğitim <i class="fas fa-check text-green-400 ml-2"></i></li>
+                                    <li><strong class="text-white">A to Z Proje Canlı Yayını</strong> <i class="fas fa-rocket text-green-400 ml-2"></i></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer CTA Action -->
+    <footer id="fiyatlandirma" class="mt-20 border-t border-white/5 bg-brand-bg relative overflow-hidden reveal no-print">
+        <div class="absolute inset-0 bg-grid-3d opacity-30 transform rotate-180"></div>
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-px bg-gradient-to-r from-transparent via-brand-primary to-transparent opacity-50"></div>
+        
+        <div class="max-w-4xl mx-auto px-6 py-24 md:py-32 text-center relative z-10">
+            <h2 class="text-5xl md:text-7xl font-display font-bold text-white mb-8 tracking-tight">
+                Geleceğe <span class="text-gradient">Dokunun.</span>
+            </h2>
+            <p class="text-gray-400 max-w-xl mx-auto font-light text-lg md:text-xl mb-12">
+                OnScala'nın kurumsal dönüşüm paketini başlatmak ve teknik detayları uzman ekibimizle görüşmek için şimdi harekete geçin.
+            </p>
+            
+            <a href="https://wa.me/905079448462" target="_blank" class="inline-flex items-center gap-3 px-10 py-5 rounded-full bg-white text-black font-bold text-lg hover:shadow-[0_0_40px_rgba(255,255,255,0.3)] hover:scale-105 transition-all duration-300 group">
+                <i class="fab fa-whatsapp text-2xl group-hover:text-green-500 transition-colors"></i> 
+                Projeyi Başlat
+            </a>
+            
+            <div class="mt-16 text-xs text-gray-600 font-light space-y-2">
+                <p>* İşbu teklifteki tüm fiyatlandırmalar KDV hariç olarak belirtilmiştir.</p>
+                <p class="text-brand-primary/80 font-medium">Dijital dönüşüm uzmanı Semanur Ayyıldız tarafından hazırlanmıştır.</p>
+                <p>&copy; 2026 OnScala. Tüm hakları saklıdır.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scroll Reveal Script (2026 Smooth Interaction) -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const reveals = document.querySelectorAll('.reveal');
+            
+            const revealOnScroll = () => {
+                const windowHeight = window.innerHeight;
+                const elementVisible = 100;
+                
+                reveals.forEach(reveal => {
+                    const elementTop = reveal.getBoundingClientRect().top;
+                    if (elementTop < windowHeight - elementVisible) {
+                        reveal.classList.add('active');
+                    }
+                });
+            };
+
+            window.addEventListener('scroll', revealOnScroll);
+            revealOnScroll(); // Trigger once on load
+        });
+    </script>
+</body>
+</html>
