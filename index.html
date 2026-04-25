@@ -1,581 +1,1400 @@
-<!DOCTYPE html>
-<html lang="tr" class="scroll-smooth">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OnScala KKK Projesi - 2026 Dijital Dönüşüm Teklifi</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            bg: '#030712', // Ultra dark background
-                            surface: 'rgba(17, 24, 39, 0.4)',
-                            primary: '#3b82f6', // Bright Blue
-                            secondary: '#06b6d4', // Cyan
-                            accent: '#8b5cf6', // Purple
-                            glow: 'rgba(59, 130, 246, 0.5)'
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['"Outfit"', 'sans-serif'],
-                        display: ['"Space Grotesk"', 'sans-serif'],
-                    },
-                    backgroundImage: {
-                        'cyber-gradient': 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #06b6d4 100%)',
-                        'glass-gradient': 'linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%)',
-                    },
-                    animation: {
-                        'float-slow': 'float 8s ease-in-out infinite',
-                        'float-fast': 'float 4s ease-in-out infinite',
-                        'pulse-glow': 'pulseGlow 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                        'spin-slow': 'spin 15s linear infinite',
-                    },
-                    keyframes: {
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0) scale(1)' },
-                            '50%': { transform: 'translateY(-20px) scale(1.02)' },
-                        },
-                        pulseGlow: {
-                            '0%, 100%': { opacity: 0.5, transform: 'scale(1)' },
-                            '50%': { opacity: 0.8, transform: 'scale(1.1)' },
-                        }
-                    }
-                }
+import React, { useState, useEffect, useRef } from 'react';
+import { 
+  Menu, X, ChevronRight, CheckCircle2, Plane, Ship, Shield, 
+  Box, Crosshair, Award, Settings, Layers, Cpu,
+  Play, ArrowRight, Activity, Target, Zap, Download,
+  Globe, ChevronDown, Lock, Clock
+} from 'lucide-react';
+
+// --- i18n SÖZLÜK ---
+const translations = {
+  tr: {
+    seo: {
+      title: "OnScala. | Scale to 1:1 | Savunma Sanayii Maket ve Model Üretimi",
+      desc: "Aselsan, Havelsan ve ASFAT gibi kurumlara askeri maket, fuar modeli ve 1:1 ölçekli savunma sanayii prototipleri üretiyoruz."
+    },
+    nav: {
+      models: "Modeller",
+      exhibition: "Fuar Çözümleri",
+      engineering: "Mühendislik",
+      refs: "Referanslar",
+      faq: "SSS",
+      catalog: "Katalog İndir",
+      quote: "Teklif İste"
+    },
+    hero: {
+      precision: "1/100 MİLİMETRİK HASSASİYET",
+      title1: "GERÇEĞİNİN",
+      title2: "KUSURSUZ",
+      title3: "İZDÜŞÜMÜ.",
+      desc: "Savunma sanayiinin öncü firmaları için hava, deniz ve kara sistemlerinin fuar odaklı dev maketlerini ve VIP promosyon modellerini üretiyoruz. Mühendislik verilerinizi sanata dönüştürüyoruz.",
+      btnPrimary: "Üretimlere Göz At",
+      btnSecondary: "Tanıtım Filmi",
+      renderStatus: "[ GERÇEK ZAMANLI 3D RENDER ]",
+      tolerance: "Tolerans",
+      local: "Yerlilik",
+      processing: "İşleniyor..."
+    },
+    refs: {
+      title: "STRATEJİK PARTNERLERİMİZ",
+      subtitle: "Türk Savunma Sanayisinin Gururlarına Hizmet Ediyoruz"
+    },
+    showcase: {
+      tag: "Platform Çözümleri",
+      title: "Hizmet Ettiğimiz Sektörler",
+      status: "AKTİF SİSTEM",
+      models: "Modelleri"
+    },
+    pipeline: {
+      tag: "Üretim Prosesi",
+      title: "Veriden Fiziksel Gerçekliğe",
+      steps: [
+        { title: "CAD Analizi", desc: "Gizlilik protokolleriyle (NDA) iletilen 3D datanın ölçeklendirilmesi ve optimize edilmesi." },
+        { title: "Katmanlı Üretim", desc: "Endüstriyel SLA/SLS yazıcılar ve 5 eksen CNC tezgahlar ile mikron hassasiyetinde üretim." },
+        { title: "Montaj & Mekanik", desc: "Motorize sistemler, LED aydınlatmalar, radar dönüş simülasyonlarının entegrasyonu." },
+        { title: "Taktik Boya & Sonuç", desc: "Gerçek MIL-SPEC kodlarında boyama, eskitme efektleri ve kalite kontrol süreci." }
+      ]
+    },
+    bento: {
+      fuar: {
+        tag: "Kurumsal Temsil",
+        title: "Fuar Alanınızı Komuta Merkezine Çevirin.",
+        desc: "IDEF, SAHA EXPO gibi global fuarlarda ziyaretçileri büyüleyin. 1:1 ölçekli mock-uplardan, kesit (cut-away) modellere kadar tüm stand ihtiyaçlarınız için anahtar teslim çözümler.",
+        items: ['Motorize radar ve pervane sistemleri', 'Kokpit içi aydınlatma ve dijital ekranlar', 'Güçlendirilmiş taşıma sandıkları (Flight Case)'],
+        link: "Fuar Portfolyosu"
+      },
+      promo: {
+        tag: "VIP & Promosyon",
+        title: "Akılda Kalıcı Taktiksel Hediyeler.",
+        desc: "Bakanlık yetkilileri, yabancı delegasyonlar veya değerli partnerleriniz için özel tasarım masaüstü maketler. Ahşap, metal ve pleksi kaideli şık sunumlar.",
+        items: ['Katlanabilir / Parçalı modüler tasarımlar', 'Metal plaka üzeri lazer kazıma', 'Markaya özel VIP askeri kasa tarzı hediye kutusu'],
+        link: "Promosyon Kataloğu"
+      }
+    },
+    whyUs: {
+      tag: "FARKIMIZ",
+      title: "Neden Bizimle Çalışmalısınız?",
+      cards: [
+        { title: "Askeri Düzey Gizlilik", desc: "Verileriniz internet erişimi olmayan (air-gapped) sistemlerde işlenir ve NDA kapsamında %100 güvence altındadır." },
+        { title: "Mikron Hassasiyeti", desc: "Endüstriyel 3D yazıcılar ve 5-eksen CNC sistemleriyle projelerinizi 1/100 milimetrik hassasiyetle üretiyoruz." },
+        { title: "Anahtar Teslim Çözüm", desc: "Tasarım optimizasyonundan, darbe emici 'flight case' taşıma sandıklarına ve fuar alanında kuruluma kadar tam hizmet." },
+        { title: "Zamanında Teslimat", desc: "Kritik lansmanlarınız ve uluslararası fuar takvimleriniz için 7/24 mesai sistemiyle tam zamanında teslimat garantisi." }
+      ]
+    },
+    faq: {
+      tag: "Bilgi Bankası & Güvenlik",
+      title: "Sıkça Sorulan Sorular",
+      items: [
+        { q: "Savunma sanayii odaklı üretimde tecrübeniz nedir?", a: "Sektörde 10 yılı aşkın köklü bir üretim deneyimine sahibiz. Bugüne kadar ASELSAN, HAVELSAN, ASFAT gibi öncü kurumlara yüzlerce projeyi eksiksiz teslim ettik ve bu süreçte %100 müşteri memnuniyeti oranımızı korumanın gururunu yaşıyoruz. Gerçekleştirdiğimiz her proje, mesleki otoritemizin bir kanıtıdır." },
+        { q: "Gizlilik Sözleşmesi (NDA) süreciniz nasıl işliyor?", a: "Savunma sanayiinin temel prensibi olan gizliliğe tavizsiz uyuyoruz. Proje görüşmeleri başlamadan önce askeri standartlarda çok taraflı NDA (Gizlilik Sözleşmesi) imzalanmaktadır. Hiçbir proje detayı veya veri, izniniz dışında 3. şahıslarla paylaşılamaz." },
+        { q: "3D CAD datalarımız ve teknik çizimlerimiz nasıl korunuyor?", a: "Müşterilerimize ait teknik çizimler, internet bağlantısı olmayan kapalı devre iş istasyonlarında işlenmektedir. Üretim bandımızdaki mühendislerimiz dışında bu verilere şirket içi erişim dahi kısıtlanmıştır." },
+        { q: "Kişisel ve kurumsal veriler KVKK/GDPR kapsamında nasıl güvence altında?", a: "Tamamen KVKK ve uluslararası GDPR yönergelerine uygun hareket ediyoruz. Faturalandırma, iletişim ve proje paydaşlarına ait tüm kişisel/kurumsal bilgiler şifrelenmiş özel sunucularda saklanmakta ve periyodik siber güvenlik denetimlerinden geçmektedir." },
+        { q: "Proje teslimi sonrası teknik datalar kalıcı olarak siliniyor mu?", a: "Evet. Projenin fiziki teslimatı tamamlandıktan ve onayınız alındıktan sonra, aksi yönde bir arşivleme talebiniz yoksa tüm CAD dataları ve render dosyaları uluslararası standartlarda (örneğin DoD 5220.22-M wipe) geri döndürülemez şekilde sistemlerimizden imha edilir." },
+        { q: "Hangi üretim teknolojilerini ve tezgahları kullanıyorsunuz?", a: "Mikron hassasiyeti sağlamak için Endüstriyel SLA/SLS 3D yazıcı parkuru, 5 eksen CNC işleme merkezleri, lazer kesim/kazıma üniteleri ve ileri düzey kalıplama (vakum döküm) teknolojilerini entegre bir şekilde kullanıyoruz." },
+        { q: "Modellerde hangi hammadde ve materyaller tercih ediliyor?", a: "Projenin boyutuna ve kullanım yerine göre havacılık sınıfı alüminyum, karbon fiber kompozitler, endüstriyel poliüretan reçineler, PLA ve ABS termoplastikler ile birlikte sergi kaideleri için premium maun/ceviz ahşap kullanmaktayız." },
+        { q: "Gerçek askeri renk (MIL-SPEC/RAL) kodlarında boyama yapabiliyor musunuz?", a: "Kesinlikle. Talep edilen MIL-SPEC veya NATO RAL kodlarındaki taktik boyalar tedarik edilerek %100 renk eşleşmesi sağlanır. Hava araçları için radar absorbe edici boya taklitleri veya kara araçları için savaş sahası (weathering/eskitme) efektleri usta ressamlarımızca uygulanır." },
+        { q: "Hangi ölçek aralıklarında üretim yapma kapasitesine sahipsiniz?", a: "Tasarımlarımız çok geniş bir yelpazeyi kapsar. 1:350 ölçekli devriyebotlarından, 1:72 ölçek savaş uçaklarına; 1:10 devasa zırhlı araçlardan, 1:1 gerçek boyutlu (Mock-up) füze ve mühimmat sistemlerine kadar her boyutta sorunsuz üretim yapabiliyoruz." },
+        { q: "Fuar maketlerine motorize (hareketli) sistemler eklenebiliyor mu?", a: "Evet. 10 yılı aşkın mühendislik vizyonumuz sayesinde dönen radar antenleri, çalışan helikopter/uçak pervaneleri, hareketli taret mekanizmaları veya hidrolik simülasyonları fuar maketlerine entegre edebiliyoruz." },
+        { q: "Kokpit içi aydınlatma ve dijital ekran (LCD/OLED) entegrasyonu mümkün mü?", a: "Tam donanımlı fuar modellerinde fiber optik aydınlatmalar, LED güverte ışıkları ve hatta kokpit içlerinde/kontrol panellerinde çalışan mini LCD/OLED ekranlarla gerçekçi simülasyonlar sağlayabiliyoruz." },
+        { q: "Üretilen dev modellerin fuar alanlarına lojistiği nasıl sağlanıyor?", a: "Modeller ne kadar büyük olursa olsun, güvenli taşıma için MIL-STD-810G standartlarına yakın dayanıklılıkta, darbe emici süngerlere sahip, tekerlekli, alüminyum kasalı özel Flight Case (Uçuş Sandıkları) üretiyoruz." },
+        { q: "Uluslararası fuarlarda kurulum ve teknik destek veriyor musunuz?", a: "Özellikle IDEF, DSEI, Eurosatory, SAHA Expo gibi uluslararası dev fuarlarda teknik ekibimiz standınıza gelerek maketin kurulumunu bizzat yapar. Fuar süresince olası teknik müdahaleler (aydınlatma/motor) için acil destek sağlarız." },
+        { q: "Büyük fuar maketleri için ortalama üretim süresi nedir?", a: "Modelin boyutu, hareketli parça sayısı ve aydınlatma gereksinimlerine bağlı olarak genellikle 6 ila 12 hafta arasında değişmektedir. Kaliteden asla ödün vermediğimiz için %100 test edilerek teslim edilir." },
+        { q: "Masaüstü promosyon ve VIP ürünler için süreç nasıl işliyor?", a: "Kurumunuzun yabancı delegasyonlara veya partnerlere hediye edeceği VIP modeller için 2 ila 4 hafta arasında butik üretim yapıyoruz. Ahşap kaideli, lazer logolu ve özel sünger yataklı kutularında teslime hazır sunuyoruz." },
+        { q: "Masaüstü promosyon (VIP) maketler için minimum sipariş adedi (MOQ) var mı?", a: "Üst düzey savunma sanayii protokolü gereği, tek 1 adet özel VIP (Bakan, Müsteşar vb. düzeyinde) üretim yapılabildiği gibi, seri üretim tekniklerimiz sayesinde binlerce adetlik filo hediyelikleri de üretebiliyoruz." },
+        { q: "Üretim sürecini takip etme ve revizyon talep etme hakkımız bulunuyor mu?", a: "Otorite bir firma olmanın getirdiği şeffaflıkla, üretimin her ana fazında (3D CAD onay, Ham Baskı, Astarlama ve Boya) sizlere görsel raporlamalar sunar, geri bildirimleriniz (revizyon) doğrultusunda sonraki adıma geçeriz." },
+        { q: "Teslimat sonrası garanti, bakım ve onarım hizmetiniz mevcut mu?", a: "Kesinlikle. %100 memnuniyet misyonumuz gereği kargo veya fuar kurulumlarında yaşanabilecek herhangi bir kaza/hasar durumunda, atölyemiz onarım garantisi ve bakım-onarım yedek parça desteği sağlamaktadır." },
+        { q: "Acil (Expedited) üretim seçeneğiniz var mı?", a: "Kritik lansmanlar ve fuarlar öncesi oluşabilecek acil ihtiyaçlar için atölyemizde 'Öncelikli Üretim Hattı' bulunmaktadır. Mevcut üretim bandını etkilemeden 7/24 mesai sistemiyle acil projelerinizde de yanınızdayız." },
+        { q: "Neden OnScala'yı tercih etmeliyiz?", a: "10 yıllık sektör tecrübemiz, 3D veri işleme etiğine (NDA) %100 sadakatimiz, kullandığımız askeri standartlardaki materyaller, şeffaf süreç yönetimimiz ve sayısız prestijli referansımız; bizi yalnızca bir üretici değil, firmanızın stratejik bir partneri yapmaktadır." }
+      ]
+    },
+    quoteForm: {
+      title: "ÜRETİM TALEBİ OLUŞTUR",
+      subtitle: "Projenizin detaylarını paylaşın, uzman mühendislik ekibimiz 24 saat içinde fizibilite ve bütçe raporu ile dönüş yapsın.",
+      name: "Ad Soyad",
+      company: "Kurum / Firma Adı",
+      email: "Kurumsal E-Posta",
+      phone: "Telefon Numarası",
+      projectType: "Proje Tipi",
+      types: ["Fuar ve Sergi Maketi", "VIP Masaüstü Promosyon", "1:1 Ölçek Mock-up", "Mühendislik Prototipi", "Diğer"],
+      details: "Proje Detayları ve Ölçek Talebi",
+      kvkk: "KVKK Aydınlatma Metnini okudum ve kişisel verilerimin işlenmesini kabul ediyorum.",
+      nda: "Proje verilerinin güvenliği için Gizlilik Sözleşmesi (NDA) sürecinin başlatılmasını talep ediyorum.",
+      submit: "Talebi Gönder",
+      cancel: "İptal"
+    },
+    cta: {
+      title: "Projenizi Başlatalım",
+      desc: "Sisteme giriş yapın. Uzman mühendislerimiz ve modelaj ekibimiz, projenizin üretim fizibilitesini ve bütçesini 24 saat içinde tarafınıza raporlasın.",
+      btn1: "Üretim Talebi Oluştur",
+      btn2: "İletişime Geç",
+      footer: ["Gizlilik Sözleşmesi (NDA) Uyumluluğu", "Uluslararası Lojistik Desteği"]
+    },
+    footer: {
+      desc: "Askeri ve endüstriyel platformların en üst düzey kalitede, gerçekçi ve fonksiyonel maket/model üretim merkezi. Ankara, Türkiye merkezli global operasyon.",
+      col1: "Platformlar",
+      col2: "Kurumsal",
+      col3: "İletişim Portalı",
+      rights: "VERİ: 2026 // ONSCALA. MODEL INDUSTRY // TÜM HAKLARI SAKLIDIR."
+    }
+  },
+  en: {
+    seo: {
+      title: "OnScala. | Scale to 1:1 | Defense Industry Scale Models & Mock-ups",
+      desc: "We produce military scale models, exhibition mock-ups, and 1:1 scale defense industry prototypes for organizations like Aselsan, Havelsan, and ASFAT."
+    },
+    nav: {
+      models: "Models",
+      exhibition: "Exhibitions",
+      engineering: "Engineering",
+      refs: "References",
+      faq: "FAQ",
+      catalog: "Download Catalog",
+      quote: "Get a Quote"
+    },
+    hero: {
+      precision: "1/100 MILLIMETRIC PRECISION",
+      title1: "FLAWLESS",
+      title2: "PROJECTION",
+      title3: "OF REALITY.",
+      desc: "We manufacture exhibition-focused giant mock-ups and VIP promotional models of air, naval, and land systems for pioneer defense companies. Transforming your engineering data into art.",
+      btnPrimary: "Explore Productions",
+      btnSecondary: "Promo Video",
+      renderStatus: "[ REAL-TIME 3D RENDER ]",
+      tolerance: "Tolerance",
+      local: "Domestication",
+      processing: "Processing..."
+    },
+    refs: {
+      title: "STRATEGIC PARTNERS",
+      subtitle: "Serving the Pride of the Defense Industry"
+    },
+    showcase: {
+      tag: "Platform Solutions",
+      title: "Sectors We Serve",
+      status: "ACTIVE SYSTEM",
+      models: "Models"
+    },
+    pipeline: {
+      tag: "Production Process",
+      title: "From Data to Physical Reality",
+      steps: [
+        { title: "CAD Analysis", desc: "Scaling and optimizing 3D data transmitted under strict NDA protocols." },
+        { title: "Additive Mfg.", desc: "Micron-level precision production via industrial SLA/SLS printers and 5-axis CNC." },
+        { title: "Assembly & Mech", desc: "Integration of motorized systems, LED lighting, and radar rotation simulations." },
+        { title: "Tactical Paint", desc: "Painting with real MIL-SPEC codes, weathering effects, and strict QC processes." }
+      ]
+    },
+    bento: {
+      fuar: {
+        tag: "Corporate Representation",
+        title: "Turn Your Booth into a Command Center.",
+        desc: "Fascinate visitors at global exhibitions like IDEF, DSEI, and Eurosatory. Turn-key solutions for all your booth needs, from 1:1 scale mock-ups to cut-away models.",
+        items: ['Motorized radar and propeller systems', 'In-cockpit lighting and digital displays', 'Reinforced Flight Case solutions'],
+        link: "Exhibition Portfolio"
+      },
+      promo: {
+        tag: "VIP & Promotion",
+        title: "Memorable Tactical Gifts.",
+        desc: "Custom-designed desktop models for ministry officials, foreign delegations, or valuable partners. Elegant presentations with wooden, metal, and plexi bases.",
+        items: ['Foldable / Modular puzzle designs', 'Laser engraving on metal plates', 'Brand-specific VIP military crate gift boxes'],
+        link: "Promo Catalog"
+      }
+    },
+    whyUs: {
+      tag: "OUR DIFFERENCE",
+      title: "Why Work With Us?",
+      cards: [
+        { title: "Military-Grade Secrecy", desc: "Your data is processed in air-gapped systems and is 100% secured under strict NDA protocols." },
+        { title: "Micron Precision", desc: "We manufacture your projects with 1/100 millimetric precision using industrial 3D printers and 5-axis CNC machines." },
+        { title: "Turn-Key Solutions", desc: "End-to-end service from design optimization to shock-absorbing flight case production and exhibition installation." },
+        { title: "On-Time Delivery", desc: "24/7 operations and guaranteed on-time delivery for your critical launches and international exhibition calendars." }
+      ]
+    },
+    faq: {
+      tag: "Knowledge Base & Security",
+      title: "Frequently Asked Questions",
+      items: [
+        { q: "What is your experience in defense industry production?", a: "We have over 10 years of deep-rooted production experience in the sector. We have flawlessly delivered hundreds of projects to leading organizations such as ASELSAN, HAVELSAN, and ASFAT, proudly maintaining a 100% customer satisfaction rate. Every project we undertake is a testament to our professional authority." },
+        { q: "How does your Non-Disclosure Agreement (NDA) process work?", a: "We strictly adhere to confidentiality, the core principle of the defense industry. Before project discussions begin, a multi-party NDA at military standards is signed. No project details or data can be shared with 3rd parties without your explicit permission." },
+        { q: "How are our 3D CAD data and technical drawings protected?", a: "Technical drawings belonging to our clients are processed on closed-circuit workstations with no internet connection. Internal access to these files is strictly limited to our production line engineers." },
+        { q: "How are personal and corporate data secured under GDPR/KVKK?", a: "We operate completely in accordance with KVKK and international GDPR guidelines. All personal/corporate information belonging to project stakeholders is stored on encrypted private servers and undergoes periodic cybersecurity audits." },
+        { q: "Is technical data permanently deleted after project delivery?", a: "Yes. After the physical delivery of the project is completed and your approval is received, unless you request archiving, all CAD data and render files are irreversibly destroyed from our systems according to international standards (e.g., DoD 5220.22-M wipe)." },
+        { q: "What production technologies and machinery do you use?", a: "To achieve micron precision, we integrate Industrial SLA/SLS 3D printing parks, 5-axis CNC machining centers, laser cutting/engraving units, and advanced molding (vacuum casting) technologies." },
+        { q: "What raw materials and materials are preferred in the models?", a: "Depending on the size and purpose of the project, we use aerospace-grade aluminum, carbon fiber composites, industrial polyurethane resins, PLA, and ABS thermoplastics, along with premium mahogany/walnut wood for exhibition bases." },
+        { q: "Can you paint in real military color (MIL-SPEC/RAL) codes?", a: "Absolutely. Tactical paints in requested MIL-SPEC or NATO RAL codes are procured to ensure a 100% color match. Radar-absorbing paint imitations for aircraft or battlefield weathering effects for land vehicles are applied by our master painters." },
+        { q: "What scale ranges do you have the capacity to produce?", a: "Our designs cover a very wide spectrum. We can seamlessly produce anything from 1:350 scale patrol boats to 1:72 scale fighter jets; from 1:10 giant armored vehicles to 1:1 real-size (Mock-up) missile and ammunition systems." },
+        { q: "Can motorized (moving) systems be added to exhibition models?", a: "Yes. Thanks to our 10+ years of engineering vision, we can integrate rotating radar antennas, spinning helicopter/plane propellers, moving turret mechanisms, or hydraulic simulations into exhibition models." },
+        { q: "Is in-cockpit lighting and digital screen (LCD/OLED) integration possible?", a: "In fully equipped exhibition models, we can provide realistic simulations with fiber optic lighting, LED deck lights, and even mini LCD/OLED screens working inside cockpits/control panels." },
+        { q: "How is the logistics of the giant models produced provided to the fairgrounds?", a: "No matter how big the models are, we produce special Flight Cases with aluminum frames, wheels, and shock-absorbing sponges, with durability close to MIL-STD-810G standards for safe transport." },
+        { q: "Do you provide installation and technical support at international fairs?", a: "Especially in giant international fairs like IDEF, DSEI, Eurosatory, and SAHA Expo, our technical team comes to your booth and personally installs the model. We provide urgent support for possible technical interventions (lighting/motor) during the fair." },
+        { q: "What is the average production time for large exhibition models?", a: "Depending on the size of the model, the number of moving parts, and lighting requirements, it usually ranges from 6 to 12 weeks. Since we never compromise on quality, they are delivered 100% tested." },
+        { q: "How does the process work for desktop promotional and VIP products?", a: "We do boutique production between 2 to 4 weeks for VIP models that your institution will gift to foreign delegations or partners. We present them ready for delivery in boxes with wooden bases, laser logos, and special sponge beds." },
+        { q: "Is there a minimum order quantity (MOQ) for desktop promotional (VIP) models?", a: "In accordance with top-level defense industry protocols, we can produce a single special VIP piece (at the Minister, Undersecretary, etc. level), or thanks to our mass production techniques, we can produce thousands of fleet gifts." },
+        { q: "Do we have the right to track the production process and request revisions?", a: "With the transparency of being an authority firm, we provide you with visual reporting at every main phase of production (3D CAD approval, Raw Printing, Priming, and Painting), and proceed to the next step based on your feedback (revision)." },
+        { q: "Do you have warranty, maintenance, and repair services after delivery?", a: "Absolutely. In line with our 100% satisfaction mission, in the event of any accident/damage that may occur during cargo or fair installations, our workshop provides a repair warranty and maintenance-repair spare parts support." },
+        { q: "Do you have an expedited production option?", a: "For urgent needs that may arise before critical launches and fairs, we have a 'Priority Production Line' in our workshop. We stand by you in your urgent projects with a 24/7 working system without affecting the current production line." },
+        { q: "Why should we choose OnScala?", a: "Our 10 years of sector experience, 100% loyalty to 3D data processing ethics (NDA), military standard materials we use, transparent process management, and countless prestigious references make us not just a manufacturer, but a strategic partner for your company." }
+      ]
+    },
+    quoteForm: {
+      title: "CREATE PRODUCTION REQUEST",
+      subtitle: "Share your project details with us, and our expert engineering team will return with a feasibility and budget report within 24 hours.",
+      name: "Full Name",
+      company: "Company / Institution Name",
+      email: "Corporate Email",
+      phone: "Phone Number",
+      projectType: "Project Type",
+      types: ["Exhibition & Fair Model", "VIP Desktop Promotion", "1:1 Scale Mock-up", "Engineering Prototype", "Other"],
+      details: "Project Details and Scale Request",
+      kvkk: "I have read the GDPR/KVKK Clarification Text and accept the processing of my personal data.",
+      nda: "I request the initiation of a Non-Disclosure Agreement (NDA) process for the security of project data.",
+      submit: "Submit Request",
+      cancel: "Cancel"
+    },
+    cta: {
+      title: "Let's Start Your Project",
+      desc: "Log into the system. Let our expert engineers and modeling team report the production feasibility and budget of your project within 24 hours.",
+      btn1: "Create Production Request",
+      btn2: "Contact Us",
+      footer: ["NDA Compliant", "International Logistics Support"]
+    },
+    footer: {
+      desc: "The ultimate scale model production center for military and industrial platforms. Global operations based in Ankara, Turkiye.",
+      col1: "Platforms",
+      col2: "Corporate",
+      col3: "Communication Portal",
+      rights: "DATA: 2026 // ONSCALA. MODEL INDUSTRY // ALL RIGHTS RESERVED."
+    }
+  }
+};
+
+// --- THREE.JS VIEWER ---
+const ThreeDViewer = ({ type }) => {
+  const mountRef = useRef(null);
+
+  useEffect(() => {
+    let mounted = true;
+    let scene, camera, renderer, animationId;
+
+    const init = () => {
+      if (!mounted || !mountRef.current || !window.THREE) return;
+      
+      mountRef.current.innerHTML = '';
+      scene = new window.THREE.Scene();
+      
+      const width = mountRef.current.clientWidth;
+      const height = mountRef.current.clientHeight;
+      
+      camera = new window.THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+      camera.position.set(5, 4, 7);
+      camera.lookAt(0, 0, 0);
+
+      renderer = new window.THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: "high-performance" });
+      renderer.setSize(width, height);
+      renderer.outputEncoding = window.THREE.sRGBEncoding;
+      renderer.toneMapping = window.THREE.ACESFilmicToneMapping;
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); 
+      mountRef.current.appendChild(renderer.domElement);
+
+      const ambientLight = new window.THREE.AmbientLight(0xffffff, 0.4);
+      scene.add(ambientLight);
+
+      const mainLight = new window.THREE.DirectionalLight(0xffffff, 2);
+      mainLight.position.set(10, 20, 15);
+      scene.add(mainLight);
+
+      // Green Fill Light for the new brand color
+      const greenFillLight = new window.THREE.PointLight(0x22c55e, 4, 30);
+      greenFillLight.position.set(-10, -5, -10);
+      scene.add(greenFillLight);
+
+      // --- TEKNİK CAD MATERYALLERİ ---
+      const techSolidMat = new window.THREE.MeshStandardMaterial({
+        color: 0x0f172a, 
+        metalness: 0.8,
+        roughness: 0.4,
+        transparent: true,
+        opacity: 0.85,
+        polygonOffset: true,
+        polygonOffsetFactor: 1, 
+        polygonOffsetUnits: 1
+      });
+      
+      const techEdgeMat = new window.THREE.LineBasicMaterial({ 
+        color: 0x4ade80, // Green edge color
+        linewidth: 2,
+        transparent: true,
+        opacity: 0.7
+      });
+
+      const vipSolidMat = new window.THREE.MeshStandardMaterial({ color: 0x1a0f08, metalness: 0.5, roughness: 0.8, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1 });
+      const vipEdgeMat = new window.THREE.LineBasicMaterial({ color: 0xd4af37, transparent: true, opacity: 0.9 });
+
+      const group = new window.THREE.Group();
+
+      const createTechMesh = (geometry, isVip = false) => {
+        const mesh = new window.THREE.Mesh(geometry, isVip ? vipSolidMat : techSolidMat);
+        const edges = new window.THREE.EdgesGeometry(geometry, 15); 
+        const lines = new window.THREE.LineSegments(edges, isVip ? vipEdgeMat : techEdgeMat);
+        mesh.add(lines);
+        return mesh;
+      };
+
+      if (type === 'hava') {
+        const bodyGeo = new window.THREE.CylinderGeometry(0.25, 0.35, 3.5, 16);
+        bodyGeo.rotateX(Math.PI / 2);
+        const body = createTechMesh(bodyGeo);
+        body.position.z = -0.25;
+
+        const noseGeo = new window.THREE.ConeGeometry(0.25, 1.5, 16);
+        noseGeo.rotateX(Math.PI / 2);
+        const nose = createTechMesh(noseGeo);
+        nose.position.z = 2.25;
+
+        const cockpitGeo = new window.THREE.SphereGeometry(0.2, 16, 16);
+        const cockpit = createTechMesh(cockpitGeo);
+        cockpit.position.set(0, 0.35, 1.0);
+        cockpit.scale.set(1, 1.3, 4);
+
+        const intakeGeo = new window.THREE.BoxGeometry(0.4, 0.3, 1.5);
+        const intakePos = intakeGeo.attributes.position;
+        for(let i=0; i<intakePos.count; i++) {
+            if(intakePos.getZ(i) > 0 && intakePos.getY(i) < 0) {
+                intakePos.setZ(i, intakePos.getZ(i) - 0.4); 
             }
         }
-    </script>
-    <style>
-        body { 
-            background-color: #030712; 
-            color: #f3f4f6;
-            overflow-x: hidden;
-        }
+        intakeGeo.computeVertexNormals();
+        const intake = createTechMesh(intakeGeo);
+        intake.position.set(0, -0.35, 0.5);
 
-        /* 2026 Next-Gen Glassmorphism */
-        .glass-2026 {
-            background: linear-gradient(145deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.005) 100%);
-            backdrop-filter: blur(32px);
-            -webkit-backdrop-filter: blur(32px);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-top: 1px solid rgba(255, 255, 255, 0.15);
-            border-left: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 30px 60px -10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-            border-radius: 28px;
-            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            position: relative;
-            z-index: 10;
+        const wingGeo = new window.THREE.BoxGeometry(4.2, 0.04, 1.8);
+        const p = wingGeo.attributes.position;
+        for(let i=0; i<p.count; i++) {
+            p.setZ(i, p.getZ(i) - Math.abs(p.getX(i)) * 0.5); 
         }
+        wingGeo.computeVertexNormals();
+        const wings = createTechMesh(wingGeo);
+        wings.position.set(0, 0, -0.5);
 
-        .glass-2026:hover {
-            transform: translateY(-8px);
-            border-color: rgba(59, 130, 246, 0.3);
-            box-shadow: 0 40px 80px -15px rgba(0, 0, 0, 0.6), 0 0 40px rgba(59, 130, 246, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-        }
+        const missileGeo = new window.THREE.CylinderGeometry(0.04, 0.04, 1.2, 8);
+        missileGeo.rotateX(Math.PI / 2);
+        const missileL = createTechMesh(missileGeo); missileL.position.set(2.1, 0, -1.5);
+        const missileR = createTechMesh(missileGeo); missileR.position.set(-2.1, 0, -1.5);
 
-        /* Glowing text effect */
-        .text-glow {
-            text-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+        const hStabGeo = new window.THREE.BoxGeometry(2.2, 0.04, 1.0);
+        const hp = hStabGeo.attributes.position;
+        for(let i=0; i<hp.count; i++) {
+            hp.setZ(i, hp.getZ(i) - Math.abs(hp.getX(i)) * 0.6);
         }
+        hStabGeo.computeVertexNormals();
+        const hStabs = createTechMesh(hStabGeo);
+        hStabs.position.set(0, -0.05, -1.8);
 
-        /* Gradient text */
-        .text-gradient {
-            background: linear-gradient(to right, #60a5fa, #c084fc, #22d3ee);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+        const vTailGeo = new window.THREE.BoxGeometry(0.06, 1.2, 1.2);
+        const vp = vTailGeo.attributes.position;
+        for(let i=0; i<vp.count; i++) {
+            if(vp.getY(i) > 0) vp.setZ(i, vp.getZ(i) - 0.8); 
         }
+        vTailGeo.computeVertexNormals();
+        const vTail = createTechMesh(vTailGeo);
+        vTail.position.set(0, 0.6, -1.6);
 
-        /* Background grid with perspective */
-        .bg-grid-3d {
-            background-image: 
-                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-            background-size: 50px 50px;
-            transform: perspective(500px) rotateX(60deg) translateY(-100px) translateZ(-200px);
-            transform-origin: top;
-            width: 200%;
-            height: 200%;
-            position: absolute;
-            top: 0;
-            left: -50%;
-            z-index: -2;
-            mask-image: linear-gradient(to bottom, black 20%, transparent 80%);
-            -webkit-mask-image: linear-gradient(to bottom, black 20%, transparent 80%);
-        }
+        const exhaustGeo = new window.THREE.CylinderGeometry(0.22, 0.3, 0.8, 16);
+        exhaustGeo.rotateX(Math.PI / 2);
+        const exhaust = createTechMesh(exhaustGeo);
+        exhaust.position.set(0, 0, -2.4);
 
-        /* Scroll Reveal Utility */
-        .reveal {
-            opacity: 0;
-            transform: translateY(40px);
-            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
-        }
-        .reveal.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        group.add(body, nose, cockpit, intake, wings, missileL, missileR, hStabs, vTail, exhaust);
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #030712; }
-        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #3b82f6; }
+      } else if (type === 'deniz') {
+        const hullGeo = new window.THREE.BoxGeometry(1.6, 1, 6);
+        const hull = createTechMesh(hullGeo);
+        hull.position.y = 0.5;
+
+        const bowGeo = new window.THREE.CylinderGeometry(0.01, 0.8, 2, 4);
+        bowGeo.rotateX(Math.PI / 2);
+        bowGeo.rotateZ(Math.PI / 4);
+        const bow = createTechMesh(bowGeo);
+        bow.position.set(0, 0.5, 4);
+        bow.scale.set(1.4, 1, 1);
+
+        const bridgeGeo = new window.THREE.BoxGeometry(1.2, 1, 1.5);
+        const bridge = createTechMesh(bridgeGeo);
+        bridge.position.set(0, 1.5, 1);
+
+        const hangarGeo = new window.THREE.BoxGeometry(1.4, 0.8, 1.5);
+        const hangar = createTechMesh(hangarGeo);
+        hangar.position.set(0, 1.4, -1);
+
+        const mastGeo = new window.THREE.BoxGeometry(0.4, 1.5, 0.4);
+        const mast = createTechMesh(mastGeo);
+        mast.position.set(0, 2.5, 1);
         
-        @media print {
-            .no-print { display: none; }
-            body { background: white; color: black; }
-            .glass-2026 { box-shadow: none; border: 1px solid #e5e7eb; background: white; filter: none; backdrop-filter: none; color: black;}
-            .text-gradient { background: none; -webkit-text-fill-color: black; color: black; }
+        const radomeGeo = new window.THREE.SphereGeometry(0.3, 16, 16);
+        const radome = createTechMesh(radomeGeo);
+        radome.position.set(0, 3.4, 1);
+
+        const gunBaseGeo = new window.THREE.CylinderGeometry(0.4, 0.4, 0.4, 16);
+        const gunBase = createTechMesh(gunBaseGeo);
+        gunBase.position.set(0, 1.2, 2.8);
+        const gunBarrelGeo = new window.THREE.CylinderGeometry(0.05, 0.05, 1.5, 8);
+        gunBarrelGeo.rotateX(Math.PI / 2);
+        const gunBarrel = createTechMesh(gunBarrelGeo);
+        gunBarrel.position.set(0, 1.3, 3.5);
+
+        const helipadGeo = new window.THREE.BoxGeometry(1.4, 0.02, 1.8);
+        const helipad = createTechMesh(helipadGeo);
+        helipad.position.set(0, 1.01, -2.4);
+
+        group.add(hull, bow, bridge, hangar, mast, radome, gunBase, gunBarrel, helipad);
+
+      } else if (type === 'kara') { 
+        const chassisGeo = new window.THREE.BoxGeometry(2.2, 0.6, 4);
+        const chassis = createTechMesh(chassisGeo);
+        chassis.position.y = 0.5;
+
+        const glacisGeo = new window.THREE.BoxGeometry(2.2, 0.6, 1);
+        const glacis = createTechMesh(glacisGeo);
+        glacis.position.set(0, 0.5, 2.2);
+        glacis.rotation.x = Math.PI / 6;
+
+        const skirtGeo = new window.THREE.BoxGeometry(0.2, 0.8, 4.5);
+        const skirtL = createTechMesh(skirtGeo); skirtL.position.set(1.2, 0.4, 0);
+        const skirtR = createTechMesh(skirtGeo); skirtR.position.set(-1.2, 0.4, 0);
+
+        for(let i=0; i<6; i++) {
+          const wheelGeo = new window.THREE.CylinderGeometry(0.3, 0.3, 0.2, 16);
+          wheelGeo.rotateZ(Math.PI / 2);
+          const wheelL = createTechMesh(wheelGeo); wheelL.position.set(1.1, 0.3, -1.8 + (i * 0.72));
+          const wheelR = createTechMesh(wheelGeo); wheelR.position.set(-1.1, 0.3, -1.8 + (i * 0.72));
+          group.add(wheelL, wheelR);
         }
-    </style>
-</head>
-<body class="antialiased selection:bg-brand-primary selection:text-white">
 
-    <!-- Ambient Background Effects -->
-    <div class="fixed inset-0 z-[-1] overflow-hidden pointer-events-none">
-        <div class="bg-grid-3d"></div>
-        <!-- Moving Orbs -->
-        <div class="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] rounded-full bg-brand-primary/15 blur-[120px] animate-pulse-glow"></div>
-        <div class="absolute top-[40%] right-[-10%] w-[40vw] h-[40vw] max-w-[500px] max-h-[500px] rounded-full bg-brand-accent/15 blur-[100px] animate-pulse-glow" style="animation-delay: 2s;"></div>
-        <div class="absolute bottom-[-20%] left-[20%] w-[60vw] h-[60vw] max-w-[700px] max-h-[700px] rounded-full bg-brand-secondary/10 blur-[130px] animate-pulse-glow" style="animation-delay: 4s;"></div>
-    </div>
+        const turretGeo = new window.THREE.BoxGeometry(1.6, 0.7, 2);
+        const turret = createTechMesh(turretGeo);
+        turret.position.set(0, 1.15, -0.2);
 
-    <!-- Ultra-modern Floating Navbar -->
-    <header class="fixed top-6 left-0 right-0 z-50 px-4 transition-all duration-300 no-print flex justify-center">
-        <div class="glass-2026 !rounded-full px-6 py-3 flex justify-between items-center w-full max-w-5xl">
-            <!-- Logo -->
-            <a href="#" class="flex items-center relative group">
-                <div class="absolute inset-0 bg-white/20 blur-md rounded-full scale-150 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <span class="text-xl md:text-2xl font-display font-bold text-white relative z-10 tracking-wide">OnScala <span class="text-brand-secondary font-medium">Teklif</span></span>
-            </a>
-            
-            <!-- Desktop Menu -->
-            <nav class="hidden md:flex space-x-8 text-sm font-medium text-gray-300">
-                <a href="#kapsam" class="hover:text-white hover:text-shadow-sm transition-all">KKK Ekosistemi</a>
-                <a href="#dijital" class="hover:text-white hover:text-shadow-sm transition-all">Dijital Varlık</a>
-                <a href="#tedarik" class="hover:text-white hover:text-shadow-sm transition-all">Tasarım Mimarisi</a>
-                <a href="#prensipler" class="hover:text-white hover:text-shadow-sm transition-all hidden lg:block">Prensipler & Takvim</a>
-            </nav>
+        const eraGeo = new window.THREE.BoxGeometry(1.8, 0.7, 1.5);
+        const era = createTechMesh(eraGeo);
+        era.position.set(0, 1.15, 0.2);
+        era.rotation.x = Math.PI / 8;
 
-            <!-- Action Button -->
-            <a href="https://wa.me/905079448462" target="_blank" class="relative group overflow-hidden rounded-full p-[1px]">
-                <span class="absolute inset-0 bg-cyber-gradient animate-spin-slow opacity-70 group-hover:opacity-100"></span>
-                <div class="relative bg-brand-bg/80 backdrop-blur-xl px-5 py-2 md:py-2.5 rounded-full text-sm font-semibold text-white flex items-center gap-2 transition-all group-hover:bg-transparent">
-                    <i class="fab fa-whatsapp text-green-400"></i>
-                    <span class="hidden sm:inline">Aksiyon Al</span>
-                </div>
-            </a>
+        const barrelGeo = new window.THREE.CylinderGeometry(0.08, 0.1, 3.5, 16);
+        barrelGeo.rotateX(Math.PI / 2);
+        const barrel = createTechMesh(barrelGeo);
+        barrel.position.set(0, 1.2, 2.5);
+        
+        const evacuatorGeo = new window.THREE.CylinderGeometry(0.12, 0.12, 0.8, 16);
+        evacuatorGeo.rotateX(Math.PI / 2);
+        const evacuator = createTechMesh(evacuatorGeo);
+        evacuator.position.set(0, 1.2, 2.0);
+
+        const mgGeo = new window.THREE.BoxGeometry(0.1, 0.1, 0.8);
+        const mg = createTechMesh(mgGeo);
+        mg.position.set(0.4, 1.6, 0.5);
+
+        group.add(chassis, glacis, skirtL, skirtR, turret, era, barrel, evacuator, mg);
+
+      } else if (type === 'vip') {
+        const baseTopGeo = new window.THREE.BoxGeometry(3, 0.2, 2);
+        const baseTop = createTechMesh(baseTopGeo, true);
+        baseTop.position.y = -0.1;
+        const baseBotGeo = new window.THREE.BoxGeometry(3.2, 0.2, 2.2);
+        const baseBot = createTechMesh(baseBotGeo, true);
+        baseBot.position.y = -0.3;
+
+        const plateGeo = new window.THREE.BoxGeometry(1, 0.05, 0.3);
+        const plate = createTechMesh(plateGeo, true);
+        plate.position.set(0, -0.1, 1.05);
+        plate.rotation.x = Math.PI / 6;
+
+        const standGeo = new window.THREE.CylinderGeometry(0.05, 0.05, 1.5, 8);
+        const stand1 = createTechMesh(standGeo, true); stand1.position.set(0, 0.6, -0.3); stand1.rotation.x = 0.2;
+        const stand2 = createTechMesh(standGeo, true); stand2.position.set(0, 0.4, 0.5); stand2.rotation.x = -0.2;
+
+        const artBodyGeo = new window.THREE.ConeGeometry(0.4, 4, 32);
+        artBodyGeo.rotateX(Math.PI / 2);
+        const artBody = createTechMesh(artBodyGeo, true);
+        artBody.position.set(0, 1.2, 0);
+
+        const artWingGeo = new window.THREE.BoxGeometry(3, 0.05, 1);
+        const artWing = createTechMesh(artWingGeo, true);
+        artWing.position.set(0, 1.2, -0.5);
+        
+        const p = artWing.geometry.attributes.position;
+        for(let i=0; i<p.count; i++) {
+            if(p.getX(i) > 0) p.setZ(i, p.getZ(i) - p.getX(i) * 0.4);
+            if(p.getX(i) < 0) p.setZ(i, p.getZ(i) + p.getX(i) * 0.4);
+        }
+        artWing.geometry.computeVertexNormals();
+
+        group.add(baseTop, baseBot, plate, stand1, stand2, artBody, artWing);
+      }
+
+      group.position.y = -0.5;
+      group.rotation.x = 0.2;
+      group.rotation.z = -0.1;
+      scene.add(group);
+
+      const animate = () => {
+        if (!mounted) return;
+        animationId = requestAnimationFrame(animate);
+        group.rotation.y -= 0.003; 
+        group.position.y = (Math.sin(Date.now() * 0.0015) * 0.1) - 0.5; 
+        renderer.render(scene, camera);
+      };
+      animate();
+    };
+
+    if (!window.THREE) {
+      const script = document.createElement('script');
+      script.src = "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js";
+      script.onload = init;
+      document.head.appendChild(script);
+    } else {
+      init();
+    }
+
+    const handleResize = () => {
+      if (camera && renderer && mountRef.current) {
+        camera.aspect = mountRef.current.clientWidth / mountRef.current.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      mounted = false;
+      window.removeEventListener('resize', handleResize);
+      if (animationId) cancelAnimationFrame(animationId);
+      if (renderer && mountRef.current) {
+        mountRef.current.innerHTML = '';
+      }
+    };
+  }, [type]);
+
+  return <div ref={mountRef} className="w-full h-full min-h-[300px]" />;
+};
+
+// --- ANA UYGULAMA BİLEŞENİ ---
+const App = () => {
+  const [lang, setLang] = useState('tr');
+  const t = translations[lang];
+
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [activeCategory, setActiveCategory] = useState('hava');
+  const [activeFaq, setActiveFaq] = useState(null);
+  
+  // Modal State
+  const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
+
+  // SEO & JSON-LD Yönetimi
+  useEffect(() => {
+    document.title = t.seo.title;
+    let metaDesc = document.querySelector('meta[name="description"]');
+    if (!metaDesc) {
+      metaDesc = document.createElement('meta');
+      metaDesc.name = "description";
+      document.head.appendChild(metaDesc);
+    }
+    metaDesc.content = t.seo.desc;
+
+    const schemaData = {
+      "@context": "https://schema.org",
+      "@type": "ManufacturingBusiness",
+      "name": "OnScala Maket Sanayi",
+      "image": "https://onscala.com/logo.png",
+      "description": t.seo.desc,
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Ankara",
+        "addressCountry": "TR"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": "39.92077",
+        "longitude": "32.85411"
+      },
+      "url": "https://onscala.com",
+      "telephone": "+908500000000",
+      "priceRange": "$$$"
+    };
+
+    let scriptTag = document.getElementById('json-ld-schema');
+    if (!scriptTag) {
+      scriptTag = document.createElement('script');
+      scriptTag.id = 'json-ld-schema';
+      scriptTag.type = 'application/ld+json';
+      document.head.appendChild(scriptTag);
+    }
+    scriptTag.innerHTML = JSON.stringify(schemaData);
+
+  }, [lang, t]);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const showcaseData = {
+    hava: {
+      title: lang === 'tr' ? "HAVACILIK & UZAY" : "AEROSPACE & AVIATION",
+      subtitle: lang === 'tr' ? "Aerodinamik Mükemmellik" : "Aerodynamic Excellence",
+      desc: lang === 'tr' ? "İHA, SİHA, 5. nesil savaş uçakları ve helikopterlerin rüzgar tüneli verilerine sadık kalınarak üretilen, karbon fiber takviyeli premium sergi modelleri." : "Premium exhibition models of UAVs, UCAVs, 5th gen fighters, and helicopters produced with strict adherence to wind tunnel data, reinforced with carbon fiber.",
+      specs: [
+        { label: "Ölçek", val: "1:10 - 1:72" },
+        { label: "Materyal", val: "Kompozit / Reçine" },
+        { label: "Detay", val: "Mühimmat & Kokpit" },
+        { label: "Ağırlık", val: "Optimize" }
+      ],
+      icon: Plane
+    },
+    deniz: {
+      title: lang === 'tr' ? "DENİZ SİSTEMLERİ" : "NAVAL SYSTEMS",
+      subtitle: lang === 'tr' ? "Güverte Üstü Hassasiyet" : "On-Deck Precision",
+      desc: lang === 'tr' ? "Fırkateynler, MİLGEM projeleri ve denizaltılar için; radar antenlerinden vurucu sistemlere kadar 1/100 milimetre hassasiyetle işlenmiş devasa modeller." : "Giant models for frigates, MILGEM projects, and submarines processed with 1/100 mm precision from radar antennas to strike systems.",
+      specs: [
+        { label: "Ölçek", val: "1:50 - 1:350" },
+        { label: "Materyal", val: "Pirinç / PLA / Reçine" },
+        { label: "Detay", val: "Hareketli Radar" },
+        { label: "Boyut", val: "3 Metreye Kadar" }
+      ],
+      icon: Ship
+    },
+    kara: {
+      title: lang === 'tr' ? "KARA & ZIRHLI ARAÇLAR" : "LAND & ARMORED VEHICLES",
+      subtitle: lang === 'tr' ? "Ağır Taktiksel Platformlar" : "Heavy Tactical Platforms",
+      desc: lang === 'tr' ? "Ana muharebe tankları, obüsler ve taktik tekerlekli zırhlı araçlar. Aktif süspansiyon taklidi ve gerçekçi zırh dokusuyla ağır siklet gösterim gücü." : "Main battle tanks, howitzers, and tactical wheeled armored vehicles. Heavyweight presentation power with active suspension imitation and realistic armor texture.",
+      specs: [
+        { label: "Ölçek", val: "1:16 - 1:35" },
+        { label: "Materyal", val: "Metal Alaşım / Reçine" },
+        { label: "Detay", val: "Palet & Taret Mekaniği" },
+        { label: "Boya", val: "Taktik Kamuflaj" }
+      ],
+      icon: Shield
+    },
+    vip: {
+      title: lang === 'tr' ? "VIP & SANATSAL MODELLER" : "VIP & ARTISTIC MODELS",
+      subtitle: lang === 'tr' ? "Eşsiz ve Kişiye Özel Tasarımlar" : "Unique and Tailor-Made Designs",
+      desc: lang === 'tr' ? "Bire bir sanatsal dokunuşla üretilen eşsiz maketler. Üst düzey protokol, bakanlık delegasyonları ve prestijli partnerleriniz için maun ahşap, pirinç ve karbon fiber detaylı göz alıcı masaüstü sanat eserleri." : "Unique models produced with a one-to-one artistic touch. Eye-catching desktop artworks with mahogany wood, brass, and carbon fiber details for top-level protocol, ministry delegations, and prestigious partners.",
+      specs: [
+        { label: lang === 'tr' ? "Kategori" : "Category", val: lang === 'tr' ? "Butik / Özel Üretim" : "Boutique / Custom" },
+        { label: "Materyal", val: "Maun / Karbon / Pirinç" },
+        { label: lang === 'tr' ? "Sunum" : "Presentation", val: "Lazer Kazıma Ahşap Kaide" },
+        { label: lang === 'tr' ? "Ambalaj" : "Packaging", val: "Özel VIP Kasa" }
+      ],
+      icon: Award
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-[#070B14] text-slate-300 font-sans selection:bg-green-500/30 selection:text-green-200 overflow-x-hidden">
+      
+      {/* GLOBAL UI EFFECTS */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_80%_at_50%_0%,#000_20%,transparent_100%)] opacity-[0.07]"></div>
+      </div>
+
+      {/* TACTICAL NAVIGATION */}
+      <nav className={`fixed w-full z-50 transition-all duration-500 ${scrolled ? 'bg-[#070B14]/90 backdrop-blur-xl border-b border-green-900/30 py-3' : 'bg-transparent py-4 md:py-6'}`}>
+        <div className="container mx-auto px-4 md:px-6 flex justify-between items-center">
+          
+          {/* Logo & Brand */}
+          <div className="flex items-center gap-3 cursor-pointer group">
+            <div className="flex flex-col justify-center">
+              <h1 className="text-2xl md:text-3xl font-black tracking-tight text-white leading-none group-hover:text-green-400 transition-colors">OnScala.</h1>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500"></span>
+                </span>
+                <span className="text-[9px] md:text-[10px] text-green-400 font-mono tracking-[0.2em] font-bold uppercase">SCALE TO 1:1</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Desktop Menu */}
+          <div className="hidden lg:flex items-center gap-8 bg-slate-900/50 border border-slate-800/50 px-8 py-3 rounded-full backdrop-blur-md">
+            {[
+              { id: 'modeller', label: t.nav.models },
+              { id: 'fuar', label: t.nav.exhibition },
+              { id: 'muhendislik', label: t.nav.engineering },
+              { id: 'referanslar', label: t.nav.refs },
+              { id: 'sss', label: t.nav.faq }
+            ].map((item) => (
+              <a key={item.id} href={`#${item.id}`} className="text-xs font-bold text-slate-400 hover:text-green-400 uppercase tracking-widest transition-colors relative group">
+                {item.label}
+                <span className="absolute -bottom-4 left-1/2 w-0 h-0.5 bg-green-400 transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
+              </a>
+            ))}
+          </div>
+
+          {/* Desktop Actions */}
+          <div className="hidden lg:flex items-center gap-4">
+            <button 
+              onClick={() => setLang(lang === 'tr' ? 'en' : 'tr')}
+              className="flex items-center gap-1 text-slate-400 hover:text-white font-mono text-xs tracking-widest px-2 transition-colors"
+            >
+              <Globe size={14} /> {lang === 'tr' ? 'EN' : 'TR'}
+            </button>
+            <button className="flex items-center gap-2 px-5 py-2.5 bg-green-600/10 border border-green-500/50 text-green-400 rounded-lg font-bold text-xs uppercase tracking-widest hover:bg-green-500 hover:text-white transition-all">
+              <Download size={14} /> {t.nav.catalog}
+            </button>
+            <button 
+              onClick={() => setIsQuoteModalOpen(true)}
+              className="px-5 py-2.5 bg-green-500 text-[#070B14] rounded-lg font-black text-xs uppercase tracking-widest hover:bg-green-400 hover:shadow-[0_0_20px_rgba(34,197,94,0.5)] transition-all"
+            >
+              {t.nav.quote}
+            </button>
+          </div>
+
+          {/* Mobile Menu Toggle */}
+          <button className="lg:hidden text-green-400 p-2" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
+          </button>
         </div>
-    </header>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-32 md:py-48 space-y-32">
-        
-        <!-- Hero Section -->
-        <section class="relative z-10 flex flex-col lg:flex-row items-center justify-between min-h-[60vh] gap-12">
+        {/* Mobile Menu Overlay */}
+        {isMenuOpen && (
+          <div className="absolute top-full left-0 w-full bg-[#070B14] border-b border-slate-800 p-6 shadow-2xl lg:hidden flex flex-col gap-6 animate-in slide-in-from-top-2">
+            <div className="flex flex-col gap-4">
+              {[
+                { id: 'modeller', label: t.nav.models },
+                { id: 'fuar', label: t.nav.exhibition },
+                { id: 'muhendislik', label: t.nav.engineering },
+                { id: 'referanslar', label: t.nav.refs },
+                { id: 'sss', label: t.nav.faq }
+              ].map((item) => (
+                <a 
+                  key={item.id} 
+                  href={`#${item.id}`} 
+                  onClick={() => setIsMenuOpen(false)}
+                  className="text-sm font-bold text-slate-300 uppercase tracking-widest"
+                >
+                  {item.label}
+                </a>
+              ))}
+            </div>
+            <div className="flex items-center justify-between border-t border-slate-800 pt-4">
+               <button 
+                onClick={() => { setLang(lang === 'tr' ? 'en' : 'tr'); setIsMenuOpen(false); }}
+                className="flex items-center gap-2 text-green-400 font-mono text-xs tracking-widest border border-green-500/30 px-4 py-2 rounded"
+              >
+                <Globe size={14} /> {lang === 'tr' ? 'SWITCH TO ENGLISH' : 'TÜRKÇE GEÇİŞ'}
+              </button>
+            </div>
+            <button 
+              onClick={() => { setIsQuoteModalOpen(true); setIsMenuOpen(false); }}
+              className="w-full py-4 bg-green-500 text-[#070B14] rounded-lg font-black text-sm uppercase tracking-widest shadow-[0_0_20px_rgba(34,197,94,0.3)]"
+            >
+              {t.nav.quote}
+            </button>
+          </div>
+        )}
+      </nav>
+
+      {/* IMMERSIVE HERO SECTION */}
+      <section className="relative min-h-screen flex items-center pt-32 pb-16 overflow-hidden border-b border-slate-800/50">
+        <div className="absolute top-1/4 right-0 w-[500px] h-[500px] md:w-[800px] md:h-[800px] bg-green-600/10 rounded-full blur-[100px] md:blur-[150px] pointer-events-none"></div>
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] md:w-[600px] md:h-[600px] bg-emerald-900/10 rounded-full blur-[100px] md:blur-[120px] pointer-events-none"></div>
+
+        <div className="container mx-auto px-4 md:px-6 relative z-10 flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
+          <div className="lg:w-1/2 z-20 pt-10 md:pt-0">
+            <div className="inline-flex items-center gap-2 md:gap-3 px-3 py-1.5 md:px-4 md:py-2 bg-slate-900/80 border border-slate-700/50 rounded-full backdrop-blur-sm mb-6 md:mb-8">
+              <Activity className="text-green-500 w-3 h-3 md:w-4 md:h-4" />
+              <span className="text-[10px] md:text-xs font-mono text-slate-300 tracking-widest uppercase">
+                SCALE TO 1:1 <span className="text-slate-600 mx-1 md:mx-2">•</span> {t.hero.precision}
+              </span>
+            </div>
             
-            <!-- Left Content -->
-            <div class="w-full lg:w-3/5 space-y-8 text-center lg:text-left reveal active">
-                <div class="inline-flex items-center gap-2 glass-2026 !rounded-full px-5 py-2.5 text-xs md:text-sm font-medium mb-2 border border-white/10 text-gray-200">
-                    <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
-                    Kurumsal İvme Programı
-                </div>
-                
-                <h1 class="text-5xl md:text-7xl lg:text-[5.5rem] font-display font-bold leading-[1.1] tracking-tight text-white">
-                    OnScala'yı <br/>
-                    <span class="text-gradient">Geleceğe</span> Taşıyın.
-                </h1>
-                
-                <p class="text-lg md:text-xl text-gray-400 max-w-2xl font-light leading-relaxed mx-auto lg:mx-0">
-                    A'dan Z'ye tasarlanmış "KKK Komple Set" ile OnScala markasının global standartlarda dijital ve fiziksel ekosistemini inşa ediyoruz. Sınırları aşmaya hazırlanın.
-                </p>
-
-                <div class="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start pt-4">
-                    <a href="#fiyatlandirma" class="w-full sm:w-auto px-8 py-4 rounded-full bg-white text-black font-bold hover:scale-105 transition-transform flex items-center justify-center gap-2">
-                        Teklifi İncele <i class="fas fa-arrow-down"></i>
-                    </a>
-                    <div class="text-sm text-gray-500 font-light flex items-center gap-2">
-                        <i class="fas fa-shield-alt text-brand-primary"></i> Kurumsal Güvence
-                    </div>
-                </div>
-            </div>
-
-            <!-- Right Visual (Jet) -->
-            <div class="w-full lg:w-2/5 relative flex justify-center items-center h-[300px] md:h-[500px] z-10 pointer-events-none reveal active">
-                <!-- Portal Effect -->
-                <div class="absolute inset-0 bg-brand-primary/20 blur-[100px] rounded-full mix-blend-screen animate-pulse-glow"></div>
-                <div class="absolute inset-10 border border-brand-secondary/30 rounded-full animate-spin-slow" style="animation-duration: 20s; border-style: dashed;"></div>
-                
-                <!-- Floating Jet -->
-                <img src="https://png.pngtree.com/png-vector/20240208/ourmid/pngtree-f-16-fighter-jet-aircraft-aviation-and-air-force-plane-airplane-png-image_11730861.png" 
-                     alt="F-16 Tech Jet" 
-                     class="w-[120%] max-w-[600px] object-contain drop-shadow-[0_30px_60px_rgba(59,130,246,0.5)] animate-float-slow transform -rotate-12">
-            </div>
-        </section>
-
-        <!-- KKK Projesi Kapsamı -->
-        <section id="kapsam" class="pt-10 reveal">
-            <div class="text-center space-y-4 mb-16">
-                <h2 class="text-4xl md:text-5xl font-display font-bold text-white text-glow">Fiziksel & Dijital Ekosistem</h2>
-                <p class="text-gray-400 max-w-2xl mx-auto text-lg font-light">Sadece bir web sitesi değil; markanızın tüm temas noktalarını kapsayan bütünleşik kurumsal mimari.</p>
-            </div>
-
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 relative">
-                <!-- Glow behind grid -->
-                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-brand-accent/5 blur-[120px] -z-10 rounded-full"></div>
-
-                <!-- Card 1 -->
-                <div class="glass-2026 p-8 group">
-                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-white/10 flex items-center justify-center text-xl text-blue-400 mb-6 group-hover:scale-110 transition-transform">
-                        <i class="fas fa-camera-retro"></i>
-                    </div>
-                    <h3 class="text-2xl font-bold text-white mb-4 font-display">İçerik & İmaj</h3>
-                    <ul class="space-y-3 text-gray-400 font-light text-sm md:text-base">
-                        <li class="flex items-start gap-3"><span class="text-brand-secondary mt-1"><i class="fas fa-circle text-[8px]"></i></span> Profesyonel Fotoğraf İstemi (Akif)</li>
-                        <li class="flex items-start gap-3"><span class="text-brand-secondary mt-1"><i class="fas fa-circle text-[8px]"></i></span> Hakkımızda & Kavramsal Sınırlılıklar Metinleri</li>
-                    </ul>
-                </div>
-
-                <!-- Card 2 -->
-                <div class="glass-2026 p-8 group">
-                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border border-white/10 flex items-center justify-center text-xl text-cyan-400 mb-6 group-hover:scale-110 transition-transform">
-                        <i class="fas fa-network-wired"></i>
-                    </div>
-                    <h3 class="text-2xl font-bold text-white mb-4 font-display">Ağ & İletişim</h3>
-                    <ul class="space-y-3 text-gray-400 font-light text-sm md:text-base">
-                        <li class="flex items-start gap-3"><span class="text-brand-primary mt-1"><i class="fas fa-circle text-[8px]"></i></span> Business Hattı & İletişim Mimarisi</li>
-                        <li class="flex items-start gap-3"><span class="text-brand-primary mt-1"><i class="fas fa-circle text-[8px]"></i></span> Facebook, Instagram, LinkedIn Kurulumu</li>
-                        <li class="flex items-start gap-3"><span class="text-brand-primary mt-1"><i class="fas fa-circle text-[8px]"></i></span> Yeni Nesil NFC Kartvizit Teknolojisi</li>
-                    </ul>
-                </div>
-
-                <!-- Card 3 -->
-                <div class="glass-2026 p-8 group md:col-span-2 lg:col-span-1">
-                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-white/10 flex items-center justify-center text-xl text-purple-400 mb-6 group-hover:scale-110 transition-transform">
-                        <i class="fas fa-book-open"></i>
-                    </div>
-                    <h3 class="text-2xl font-bold text-white mb-4 font-display">Kurumsal Materyal</h3>
-                    <ul class="space-y-3 text-gray-400 font-light text-sm md:text-base">
-                        <li class="flex items-start gap-3"><span class="text-brand-accent mt-1"><i class="fas fa-circle text-[8px]"></i></span> Premium Dijital ve Basılı Katalog</li>
-                        <li class="flex items-start gap-3"><span class="text-brand-accent mt-1"><i class="fas fa-circle text-[8px]"></i></span> İnteraktif Mobil Broşür Formatı</li>
-                        <li class="flex items-start gap-3"><span class="text-brand-accent mt-1"><i class="fas fa-circle text-[8px]"></i></span> Markaya Özel Teklif Formu Tasarımı</li>
-                    </ul>
-                </div>
-            </div>
-        </section>
-
-        <!-- Web Sitesi & Kurumsal Kimlik (Yatırım Detayları) -->
-        <section id="dijital" class="pt-10 reveal">
-            <div class="grid lg:grid-cols-2 gap-8 md:gap-12">
-                
-                <!-- Web & SEO Bütçesi -->
-                <div class="glass-2026 p-8 md:p-12 relative overflow-hidden flex flex-col justify-between">
-                    <div class="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 rounded-full blur-[80px] -z-10 pointer-events-none"></div>
-                    
-                    <div>
-                        <div class="inline-block px-4 py-1.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 text-sm font-semibold mb-6">
-                            Web & SEO Mimarisi
-                        </div>
-                        <h3 class="text-3xl md:text-4xl font-display font-bold text-white mb-6">Sınır Tanımayan <br>Dijital Merkez.</h3>
-                        <p class="text-gray-400 font-light mb-8">viapia.com.tr emsalinde, dünya standartlarında hıza ve teknolojiye sahip, arama motorlarını domine edecek çok dilli kurumsal altyapı.</p>
-                        
-                        <div class="space-y-4 mb-10">
-                            <div class="glass-2026 !rounded-xl !p-4 !border-white/5 flex items-center gap-4">
-                                <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-cyan-400"><i class="fas fa-globe"></i></div>
-                                <div>
-                                    <div class="text-white font-semibold">Çok Dilli Altyapı</div>
-                                    <div class="text-xs text-gray-500">ENG, TR ve GEO entegrasyonu</div>
-                                </div>
-                            </div>
-                            <div class="glass-2026 !rounded-xl !p-4 !border-white/5 flex items-center gap-4">
-                                <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-cyan-400"><i class="fas fa-robot"></i></div>
-                                <div>
-                                    <div class="text-white font-semibold">Yapay Zeka & SEO</div>
-                                    <div class="text-xs text-gray-500">JSON-LD yapısı + 10 Adet AI Destekli Sektörel Makale</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="pt-8 border-t border-white/10 flex justify-between items-end">
-                        <div>
-                            <div class="text-sm text-gray-500 mb-1">Teslimat: 30 İş Günü</div>
-                            <div class="text-4xl md:text-5xl font-bold text-white">45.000 <span class="text-xl text-gray-500 font-normal">TL</span></div>
-                        </div>
-                        <div class="text-xs text-cyan-400/50">+ KDV</div>
-                    </div>
-                </div>
-
-                <!-- Kurumsal Kimlik Bütçesi -->
-                <div class="glass-2026 p-8 md:p-12 relative overflow-hidden flex flex-col justify-between">
-                    <div class="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-[80px] -z-10 pointer-events-none"></div>
-                    
-                    <div>
-                        <div class="inline-block px-4 py-1.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 text-sm font-semibold mb-6">
-                            Marka Kimliği
-                        </div>
-                        <h3 class="text-3xl md:text-4xl font-display font-bold text-white mb-6">Akılda Kalıcı <br>Kusursuz İmaj.</h3>
-                        <p class="text-gray-400 font-light mb-8">OnScala'nın karakterini yansıtan, tüm dijital ve basılı medyalara uyarlanabilir premium görsel kimlik seti.</p>
-                        
-                        <div class="space-y-4 mb-10">
-                            <div class="glass-2026 !rounded-xl !p-4 !border-white/5 flex items-center gap-4">
-                                <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-blue-400"><i class="fas fa-bezier-curve"></i></div>
-                                <div>
-                                    <div class="text-white font-semibold">Vektörel Logo</div>
-                                    <div class="text-xs text-gray-500">Çoklu kullanım formatları ve kılavuzu</div>
-                                </div>
-                            </div>
-                            <div class="glass-2026 !rounded-xl !p-4 !border-white/5 flex items-center gap-4">
-                                <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-blue-400"><i class="fas fa-swatchbook"></i></div>
-                                <div>
-                                    <div class="text-white font-semibold">Kimlik Kiti</div>
-                                    <div class="text-xs text-gray-500">Antetli kağıt, zarf, dosya, fatura şablonları</div>
-                                </div>
-                            </div>
-                            <div class="glass-2026 !rounded-xl !p-4 !border-white/5 flex items-center gap-4">
-                                <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-blue-400"><i class="fas fa-envelope-open-text"></i></div>
-                                <div>
-                                    <div class="text-white font-semibold">Kurumsal İletişim</div>
-                                    <div class="text-xs text-gray-500">info@ mail kurulumları ve HTML mail imzaları</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="pt-8 border-t border-white/10 flex justify-between items-end">
-                        <div>
-                            <div class="text-sm text-gray-500 mb-1">Kurumsal Logo & Kit</div>
-                            <div class="text-4xl md:text-5xl font-bold text-white">15.000 <span class="text-xl text-gray-500 font-normal">TL</span></div>
-                        </div>
-                        <div class="text-xs text-blue-400/50">+ KDV</div>
-                    </div>
-                </div>
-
-            </div>
-        </section>
-
-        <!-- Tedarik Tasarım Mimarisi -->
-        <section id="tedarik" class="pt-10 reveal">
-            <div class="text-center space-y-4 mb-16">
-                <h2 class="text-4xl md:text-5xl font-display font-bold text-white text-glow">Tedarik Zinciri Tasarımları</h2>
-                <p class="text-gray-400 max-w-2xl mx-auto text-lg font-light">Ürün sunumlarınıza ve paketlemenize değer katacak ölçeklenebilir tasarım hizmetleri.</p>
-            </div>
-
-            <div class="grid md:grid-cols-3 gap-6 md:gap-8">
-                
-                <!-- Tier 1 -->
-                <div class="glass-2026 p-8 flex flex-col justify-between hover:-translate-y-2 transition-transform duration-300">
-                    <div>
-                        <div class="text-gray-500 text-sm font-bold uppercase tracking-widest mb-4">Seviye 1</div>
-                        <h4 class="text-2xl font-bold text-white mb-4">Basit İçerikler</h4>
-                        <p class="text-gray-400 font-light text-sm mb-8">Vektörel tabanlı temel grafik düzenlemeleri, standart görsel materyaller ve sosyal medya adaptasyonları.</p>
-                    </div>
-                    <div>
-                        <div class="text-3xl font-bold text-white mb-1">1.500 <span class="text-base text-gray-500 font-normal">TL</span></div>
-                        <div class="text-xs text-gray-600">Adet Başına (+KDV)</div>
-                    </div>
-                </div>
-
-                <!-- Tier 2 (Highlighted) -->
-                <div class="glass-2026 p-8 flex flex-col justify-between relative transform md:-translate-y-4 shadow-[0_0_40px_rgba(59,130,246,0.15)] !border-brand-primary/30">
-                    <div class="absolute inset-0 bg-gradient-to-b from-brand-primary/10 to-transparent rounded-3xl pointer-events-none"></div>
-                    <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-primary text-white text-[10px] font-bold px-4 py-1.5 rounded-full uppercase tracking-wider shadow-[0_0_15px_rgba(59,130,246,0.5)]">
-                        Önerilen
-                    </div>
-                    
-                    <div class="relative z-10">
-                        <div class="text-brand-primary text-sm font-bold uppercase tracking-widest mb-4 mt-2">Seviye 2</div>
-                        <h4 class="text-2xl font-bold text-white mb-4">Özelleştirilmiş</h4>
-                        <p class="text-gray-300 font-light text-sm mb-8">Markaya özel hazırlanmış, spesifik konsept tasarım çalışmaları ve detaylı vektörel illüstrasyonlar.</p>
-                    </div>
-                    <div class="relative z-10">
-                        <div class="text-4xl font-bold text-gradient mb-1">2.500 <span class="text-base text-gray-400 font-normal">TL</span></div>
-                        <div class="text-xs text-brand-primary/70">Adet Başına (+KDV)</div>
-                    </div>
-                </div>
-
-                <!-- Tier 3 -->
-                <div class="glass-2026 p-8 flex flex-col justify-between hover:-translate-y-2 transition-transform duration-300">
-                    <div>
-                        <div class="text-brand-accent text-sm font-bold uppercase tracking-widest mb-4">Seviye 3</div>
-                        <h4 class="text-2xl font-bold text-white mb-4">Kapsamlı</h4>
-                        <p class="text-gray-400 font-light text-sm mb-8">Kutu, ambalaj, stant ve çoklu yüzeye sahip detaylı endüstriyel grafik tasarım mimarisi.</p>
-                    </div>
-                    <div>
-                        <div class="text-3xl font-bold text-white mb-1">5.000 <span class="text-base text-gray-500 font-normal">TL</span></div>
-                        <div class="text-xs text-gray-600">Adet Başına (+KDV)</div>
-                    </div>
-                </div>
-
-            </div>
-        </section>
-
-        <!-- Çalışma Prensipleri & Sorumluluklar -->
-        <section id="prensipler" class="pt-20 reveal">
-            <div class="text-center space-y-4 mb-16">
-                <h2 class="text-4xl md:text-5xl font-display font-bold text-white text-glow">Çalışma Prensipleri</h2>
-                <p class="text-gray-400 max-w-2xl mx-auto text-lg font-light">Kusursuz bir proje yönetimi için belirlediğimiz temel sorumluluk ve işleyiş kuralları.</p>
-            </div>
-
-            <div class="grid md:grid-cols-2 gap-8">
-                <!-- Prensip 1: Görseller (Müşteri) -->
-                <div class="glass-2026 p-8 flex items-start gap-6 border-l-2 border-l-brand-secondary">
-                    <div class="w-12 h-12 shrink-0 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-400 text-xl"><i class="fas fa-images"></i></div>
-                    <div>
-                        <h4 class="text-xl font-bold text-white mb-2">Görsel Tedariği (OnScala)</h4>
-                        <p class="text-gray-400 font-light text-sm">Tasarım, web ve sosyal medya süreçlerinde kullanılacak tüm ham görseller, ürün fotoğrafları ve videolar <strong>OnScala ekibi tarafından sağlanacaktır.</strong> (Ajansımız, sağlanan bu ham materyalleri tasarımlara uygun olarak işler ve optimize eder).</p>
-                    </div>
-                </div>
-
-                <!-- Prensip 2: İçerik -->
-                <div class="glass-2026 p-8 flex items-start gap-6 border-l-2 border-l-brand-primary">
-                    <div class="w-12 h-12 shrink-0 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 text-xl"><i class="fas fa-file-signature"></i></div>
-                    <div>
-                        <h4 class="text-xl font-bold text-white mb-2">Onay ve Revizyon Süreçleri</h4>
-                        <p class="text-gray-400 font-light text-sm">Teslim edilen her modül (Web, Logo, Katalog vb.) için standart 2 tur minör revizyon hakkı bulunmaktadır. Projenin ilerleyişi, karşılıklı adım adım onay mekanizmalarıyla hız kesmeden sağlanır.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Proje Takvimi (30 Gün) -->
-        <section id="takvim" class="pt-20 reveal">
-            <div class="text-center space-y-4 mb-16">
-                <h2 class="text-4xl md:text-5xl font-display font-bold text-white text-glow">30 Günlük Aksiyon Planı</h2>
-                <p class="text-gray-400 max-w-2xl mx-auto text-lg font-light">Projenin başlama vuruşundan tamamen yayına alınmasına kadar geçen sürenin yol haritası.</p>
-            </div>
-
-            <div class="relative max-w-4xl mx-auto mt-12">
-                <!-- Orta Çizgi (Line) -->
-                <div class="absolute left-[28px] md:left-1/2 md:-translate-x-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-brand-primary via-brand-secondary to-transparent"></div>
-
-                <div class="space-y-12">
-                    <!-- Hafta 1 -->
-                    <div class="relative flex flex-col md:flex-row items-start md:items-center md:justify-between group">
-                        <div class="absolute left-[28px] md:left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-brand-bg border-2 border-brand-primary group-hover:bg-brand-primary group-hover:shadow-[0_0_15px_rgba(59,130,246,0.8)] transition-all z-10"></div>
-                        <div class="ml-16 md:ml-0 md:w-[45%] md:text-right md:pr-12">
-                            <h4 class="text-2xl font-bold text-white">1. Hafta: Keşif & Mimari</h4>
-                        </div>
-                        <div class="ml-16 md:ml-0 md:w-[45%] md:pl-12 mt-2 md:mt-0">
-                            <div class="glass-2026 p-6 border-t-2 border-t-brand-primary/50">
-                                <ul class="text-sm text-gray-400 font-light space-y-2">
-                                    <li><i class="fas fa-check text-brand-primary mr-2"></i> OnScala'dan görsel/materyal transferi</li>
-                                    <li><i class="fas fa-check text-brand-primary mr-2"></i> Logo ve kurumsal kimlik eskizleri</li>
-                                    <li><i class="fas fa-check text-brand-primary mr-2"></i> Web domain, hosting ve kurumsal mail kurulumları</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Hafta 2 -->
-                    <div class="relative flex flex-col md:flex-row items-start md:items-center md:justify-between group md:flex-row-reverse">
-                        <div class="absolute left-[28px] md:left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-brand-bg border-2 border-brand-secondary group-hover:bg-brand-secondary group-hover:shadow-[0_0_15px_rgba(6,182,212,0.8)] transition-all z-10"></div>
-                        <div class="ml-16 md:ml-0 md:w-[45%] md:text-left md:pl-12">
-                            <h4 class="text-2xl font-bold text-white">2. Hafta: Tasarım & UI</h4>
-                        </div>
-                        <div class="ml-16 md:ml-0 md:w-[45%] md:pr-12 mt-2 md:mt-0 md:text-right">
-                            <div class="glass-2026 p-6 border-t-2 border-t-brand-secondary/50">
-                                <ul class="text-sm text-gray-400 font-light space-y-2">
-                                    <li>Katalog ve broşür ana taslakları <i class="fas fa-check text-brand-secondary ml-2"></i></li>
-                                    <li>Web sitesi arayüz (UI) tasarımı <i class="fas fa-check text-brand-secondary ml-2"></i></li>
-                                    <li>Kurumsal mail imzalarının entegrasyonu <i class="fas fa-check text-brand-secondary ml-2"></i></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Hafta 3 -->
-                    <div class="relative flex flex-col md:flex-row items-start md:items-center md:justify-between group">
-                        <div class="absolute left-[28px] md:left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-brand-bg border-2 border-brand-accent group-hover:bg-brand-accent group-hover:shadow-[0_0_15px_rgba(139,92,246,0.8)] transition-all z-10"></div>
-                        <div class="ml-16 md:ml-0 md:w-[45%] md:text-right md:pr-12">
-                            <h4 class="text-2xl font-bold text-white">3. Hafta: Kodlama & Geliştirme</h4>
-                        </div>
-                        <div class="ml-16 md:ml-0 md:w-[45%] md:pl-12 mt-2 md:mt-0">
-                            <div class="glass-2026 p-6 border-t-2 border-t-brand-accent/50">
-                                <ul class="text-sm text-gray-400 font-light space-y-2">
-                                    <li><i class="fas fa-check text-brand-accent mr-2"></i> Web sitesi altyapı kodlaması</li>
-                                    <li><i class="fas fa-check text-brand-accent mr-2"></i> Çok dilli yapının (TR/EN/GEO) inşası</li>
-                                    <li><i class="fas fa-check text-brand-accent mr-2"></i> AI destekli sektörel SEO makalelerinin yazımı</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Hafta 4 -->
-                    <div class="relative flex flex-col md:flex-row items-start md:items-center md:justify-between group md:flex-row-reverse">
-                        <div class="absolute left-[28px] md:left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-brand-bg border-2 border-green-400 group-hover:bg-green-400 group-hover:shadow-[0_0_15px_rgba(74,222,128,0.8)] transition-all z-10"></div>
-                        <div class="ml-16 md:ml-0 md:w-[45%] md:text-left md:pl-12">
-                            <h4 class="text-2xl font-bold text-white">4. Hafta: Test & Teslimat</h4>
-                        </div>
-                        <div class="ml-16 md:ml-0 md:w-[45%] md:pr-12 mt-2 md:mt-0 md:text-right">
-                            <div class="glass-2026 p-6 border-t-2 border-t-green-400/50 shadow-[0_0_20px_rgba(74,222,128,0.1)]">
-                                <ul class="text-sm text-gray-400 font-light space-y-2">
-                                    <li>Sosyal medya ve iletişim ağlarının testi <i class="fas fa-check text-green-400 ml-2"></i></li>
-                                    <li>Son revizyonların uygulanması ve eğitim <i class="fas fa-check text-green-400 ml-2"></i></li>
-                                    <li><strong class="text-white">A to Z Proje Canlı Yayını</strong> <i class="fas fa-rocket text-green-400 ml-2"></i></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Footer CTA Action -->
-    <footer id="fiyatlandirma" class="mt-20 border-t border-white/5 bg-brand-bg relative overflow-hidden reveal no-print">
-        <div class="absolute inset-0 bg-grid-3d opacity-30 transform rotate-180"></div>
-        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-px bg-gradient-to-r from-transparent via-brand-primary to-transparent opacity-50"></div>
-        
-        <div class="max-w-4xl mx-auto px-6 py-24 md:py-32 text-center relative z-10">
-            <h2 class="text-5xl md:text-7xl font-display font-bold text-white mb-8 tracking-tight">
-                Geleceğe <span class="text-gradient">Dokunun.</span>
+            <h2 className="text-4xl sm:text-5xl md:text-7xl font-black text-white leading-[1.1] tracking-tight mb-6 md:mb-8">
+              {t.hero.title1} <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 via-emerald-500 to-green-600">
+                {t.hero.title2}
+              </span> <br /> {t.hero.title3}
             </h2>
-            <p class="text-gray-400 max-w-xl mx-auto font-light text-lg md:text-xl mb-12">
-                OnScala'nın kurumsal dönüşüm paketini başlatmak ve teknik detayları uzman ekibimizle görüşmek için şimdi harekete geçin.
+            
+            <p className="text-base md:text-lg text-slate-400 leading-relaxed mb-8 md:mb-10 max-w-xl border-l-2 border-green-500/50 pl-4 md:pl-6">
+              {t.hero.desc}
             </p>
             
-            <a href="https://wa.me/905079448462" target="_blank" class="inline-flex items-center gap-3 px-10 py-5 rounded-full bg-white text-black font-bold text-lg hover:shadow-[0_0_40px_rgba(255,255,255,0.3)] hover:scale-105 transition-all duration-300 group">
-                <i class="fab fa-whatsapp text-2xl group-hover:text-green-500 transition-colors"></i> 
-                Projeyi Başlat
-            </a>
-            
-            <div class="mt-16 text-xs text-gray-600 font-light space-y-2">
-                <p>* İşbu teklifteki tüm fiyatlandırmalar KDV hariç olarak belirtilmiştir.</p>
-                <p class="text-brand-primary/80 font-medium">Dijital dönüşüm uzmanı Semanur Ayyıldız tarafından hazırlanmıştır.</p>
-                <p>&copy; 2026 OnScala. Tüm hakları saklıdır.</p>
+            <div className="flex flex-col sm:flex-row items-center gap-4 md:gap-6">
+              <button 
+                onClick={() => setIsQuoteModalOpen(true)}
+                className="w-full sm:w-auto px-6 py-4 md:px-8 bg-green-500 text-[#070B14] rounded-lg font-black text-xs md:text-sm uppercase tracking-widest hover:bg-green-400 hover:shadow-[0_0_30px_rgba(34,197,94,0.4)] transition-all flex items-center justify-center gap-3 group"
+              >
+                {t.hero.btnPrimary} <ArrowRight className="w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-2 transition-transform" />
+              </button>
+              <button className="w-full sm:w-auto px-6 py-4 md:px-8 bg-transparent text-white border border-slate-700 hover:border-green-500 hover:bg-slate-900 rounded-lg font-bold text-xs md:text-sm uppercase tracking-widest transition-all flex items-center justify-center gap-3">
+                <Play size={16} className="text-green-400" />
+                {t.hero.btnSecondary}
+              </button>
             </div>
-        </div>
-    </footer>
+          </div>
 
-    <!-- Scroll Reveal Script (2026 Smooth Interaction) -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const reveals = document.querySelectorAll('.reveal');
-            
-            const revealOnScroll = () => {
-                const windowHeight = window.innerHeight;
-                const elementVisible = 100;
+          {/* Tactical Blueprint Display */}
+          <div className="lg:w-1/2 w-full relative z-10 mt-12 lg:mt-0">
+            <div className="relative aspect-square md:aspect-video lg:aspect-square bg-slate-950/50 border border-green-900/30 rounded-2xl p-2 md:p-4 overflow-hidden backdrop-blur-sm shadow-2xl">
+              <div className="absolute top-0 left-0 w-6 h-6 md:w-8 md:h-8 border-t-2 border-l-2 border-green-500/50"></div>
+              <div className="absolute top-0 right-0 w-6 h-6 md:w-8 md:h-8 border-t-2 border-r-2 border-green-500/50"></div>
+              <div className="absolute bottom-0 left-0 w-6 h-6 md:w-8 md:h-8 border-b-2 border-l-2 border-green-500/50"></div>
+              <div className="absolute bottom-0 right-0 w-6 h-6 md:w-8 md:h-8 border-b-2 border-r-2 border-green-500/50"></div>
+              
+              <div className="absolute top-0 left-0 w-full h-1 bg-green-400/50 shadow-[0_0_20px_rgba(34,197,94,0.8)] animate-scan"></div>
+              
+              <div className="w-full h-full border border-slate-800/50 rounded-xl bg-[#0a0f1c] relative flex items-center justify-center overflow-hidden">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(34,197,94,0.05)_0,transparent_60%)]"></div>
+                <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMzQsMTk3LDk0LDAuMDUpIi8+PC9zdmc+')] bg-repeat"></div>
                 
-                reveals.forEach(reveal => {
-                    const elementTop = reveal.getBoundingClientRect().top;
-                    if (elementTop < windowHeight - elementVisible) {
-                        reveal.classList.add('active');
-                    }
-                });
-            };
+                {/* 3D Render */}
+                <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none p-2 md:p-4">
+                  <ThreeDViewer type="hava" />
+                </div>
+                
+                <div className="absolute bottom-4 md:bottom-6 left-0 right-0 z-20 text-center pointer-events-none">
+                  <p className="text-green-400 font-mono text-[10px] md:text-sm tracking-widest bg-slate-900/50 inline-block px-3 py-1 md:px-4 md:py-1 rounded-full backdrop-blur-md border border-green-500/20 shadow-[0_0_15px_rgba(34,197,94,0.2)]">
+                    {t.hero.renderStatus}
+                  </p>
+                </div>
 
-            window.addEventListener('scroll', revealOnScroll);
-            revealOnScroll(); // Trigger once on load
-        });
-    </script>
-</body>
-</html>
+                <div className="absolute top-4 right-4 flex flex-col gap-2 z-20">
+                  {[1,2,3].map(i => (
+                    <div key={i} className="flex items-center gap-2">
+                      <div className="h-1 w-6 md:w-8 bg-slate-800 rounded-full overflow-hidden">
+                        <div className={`h-full bg-green-500 w-[${Math.random() * 100}%] opacity-50`}></div>
+                      </div>
+                      <span className="text-[8px] text-green-500/70 font-mono hidden sm:block">DAT_0{i}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            
+            <div className="absolute -bottom-6 -left-4 md:-bottom-8 md:-left-8 bg-slate-900 border border-slate-700 p-4 md:p-6 rounded-xl shadow-2xl flex gap-6 md:gap-8 z-30">
+              <div>
+                <div className="text-slate-400 text-[10px] md:text-xs font-mono uppercase mb-1">{t.hero.tolerance}</div>
+                <div className="text-xl md:text-2xl font-black text-white">±0.01<span className="text-green-500 text-xs md:text-sm">mm</span></div>
+              </div>
+              <div className="w-px bg-slate-700"></div>
+              <div>
+                <div className="text-slate-400 text-[10px] md:text-xs font-mono uppercase mb-1">{t.hero.local}</div>
+                <div className="text-xl md:text-2xl font-black text-white">%100</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* STRATEGIC PARTNERS (REFERENCES) */}
+      <section id="referanslar" className="bg-[#04070a] border-b border-slate-900 py-12 md:py-16 overflow-hidden">
+        <div className="container mx-auto px-4 md:px-6 text-center mb-8 md:mb-10">
+           <h3 className="text-green-500 font-mono text-[10px] md:text-xs tracking-[0.3em] uppercase mb-2 md:mb-3">{t.refs.title}</h3>
+           <h2 className="text-xl md:text-2xl font-black text-white">{t.refs.subtitle}</h2>
+        </div>
+        
+        {/* Infinite Marquee Effect Setup */}
+        <div className="relative flex overflow-x-hidden group">
+          <div className="flex w-max animate-marquee space-x-16 md:space-x-24 items-center px-4 md:px-8">
+            {[1, 2, 3, 4].map((set) => (
+              <React.Fragment key={set}>
+                <img 
+                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/ASELSAN_logo.svg/3840px-ASELSAN_logo.svg.png" 
+                  alt="ASELSAN" 
+                  className="h-8 md:h-12 object-contain brightness-0 invert opacity-40 hover:opacity-100 transition-all duration-300 hover:-translate-y-1 cursor-pointer" 
+                />
+                <img 
+                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/HAVELSAN_logo.svg/2560px-HAVELSAN_logo.svg.png" 
+                  alt="HAVELSAN" 
+                  className="h-6 md:h-10 object-contain brightness-0 invert opacity-40 hover:opacity-100 transition-all duration-300 hover:-translate-y-1 cursor-pointer" 
+                />
+                <img 
+                  src="https://static.hvkk.tsk.tr/StaticImages/logo/hvkk-header-logo-tr-white.png" 
+                  alt="HAVA KUVVETLERİ" 
+                  className="h-12 md:h-16 object-contain opacity-40 hover:opacity-100 transition-all duration-300 hover:-translate-y-1 cursor-pointer" 
+                />
+                <img 
+                  src="https://upload.wikimedia.org/wikipedia/tr/1/11/AsfatLogo.png" 
+                  alt="ASFAT" 
+                  className="h-8 md:h-12 object-contain brightness-0 invert opacity-40 hover:opacity-100 transition-all duration-300 hover:-translate-y-1 cursor-pointer" 
+                />
+              </React.Fragment>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* INTERACTIVE SHOWCASE SECTION */}
+      <section id="modeller" className="py-24 md:py-32 relative">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="mb-12 md:mb-16">
+            <h3 className="text-green-500 font-mono text-xs md:text-sm tracking-[0.3em] uppercase mb-3 md:mb-4 flex items-center gap-3">
+              <Zap size={16} /> {t.showcase.tag}
+            </h3>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tight">{t.showcase.title}</h2>
+          </div>
+
+          <div className="flex flex-col lg:flex-row gap-8 md:gap-12">
+            <div className="lg:w-1/3 flex flex-col gap-3 md:gap-4">
+              {Object.keys(showcaseData).map((key) => {
+                const isActive = activeCategory === key;
+                const Icon = showcaseData[key].icon;
+                return (
+                  <button 
+                    key={key}
+                    onClick={() => setActiveCategory(key)}
+                    className={`flex flex-row items-center gap-4 md:gap-6 p-4 md:p-6 rounded-xl border transition-all duration-300 text-left ${
+                      isActive 
+                      ? 'bg-slate-900 border-green-500/50 shadow-[0_0_30px_rgba(34,197,94,0.1)]' 
+                      : 'bg-[#0a0f1c] border-slate-800/50 hover:border-slate-600 hover:bg-slate-900/50 opacity-70 hover:opacity-100'
+                    }`}
+                  >
+                    <div className={`p-3 md:p-4 rounded-lg shrink-0 bg-slate-950 border ${isActive ? 'border-green-500/50 text-green-400' : 'border-slate-800 text-slate-500'}`}>
+                      <Icon size={20} className="md:w-6 md:h-6" />
+                    </div>
+                    <div>
+                      <div className={`font-black tracking-widest uppercase text-base md:text-lg ${isActive ? 'text-white' : 'text-slate-400'}`}>
+                        {showcaseData[key].title}
+                      </div>
+                      <div className="text-xs md:text-sm font-medium text-slate-500 mt-1">{showcaseData[key].subtitle}</div>
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
+
+            <div className="lg:w-2/3 bg-slate-900/40 border border-slate-800 rounded-2xl p-6 md:p-12 relative overflow-hidden group min-h-[400px] md:min-h-[500px]">
+              <div className="absolute top-0 right-0 w-48 h-48 md:w-64 md:h-64 bg-green-600/5 blur-[80px] md:blur-[100px] rounded-full"></div>
+              
+              <div className="absolute inset-y-0 right-[-10%] md:right-[-5%] w-[100%] md:w-[80%] opacity-30 pointer-events-none z-0 mix-blend-screen transition-opacity duration-500">
+                <ThreeDViewer type={activeCategory} />
+              </div>
+              
+              <div className="relative z-10 flex flex-col h-full justify-between pointer-events-none">
+                <div>
+                  <div className="flex items-center gap-3 md:gap-4 mb-4 md:mb-6">
+                    <span className="px-2 py-1 md:px-3 bg-green-500/10 border border-green-500/30 text-green-400 font-mono text-[10px] md:text-xs uppercase tracking-widest rounded">
+                      {t.showcase.status}
+                    </span>
+                    <span className="w-full h-px bg-slate-800"></span>
+                  </div>
+                  
+                  <h3 className="text-2xl md:text-3xl font-black text-white mb-3 md:mb-4 uppercase tracking-widest">
+                    {showcaseData[activeCategory].title} {t.showcase.models}
+                  </h3>
+                  <p className="text-sm md:text-lg text-slate-400 leading-relaxed mb-8 md:mb-12 max-w-2xl">
+                    {showcaseData[activeCategory].desc}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 border-t border-slate-800 pt-6 md:pt-8">
+                  {showcaseData[activeCategory].specs.map((spec, idx) => (
+                    <div key={idx}>
+                      <div className="text-[10px] md:text-xs text-slate-500 font-mono uppercase mb-1 md:mb-2">{spec.label}</div>
+                      <div className="text-xs md:text-sm font-bold text-slate-200">{spec.val}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ENGINEERING PIPELINE */}
+      <section id="muhendislik" className="py-24 bg-[#0a0f1c] border-y border-slate-900">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="text-center max-w-3xl mx-auto mb-16 md:mb-20">
+             <h3 className="text-green-500 font-mono text-xs md:text-sm tracking-[0.3em] uppercase mb-3 md:mb-4">{t.pipeline.tag}</h3>
+             <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight">{t.pipeline.title}</h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-8 relative">
+            <div className="hidden lg:block absolute top-12 left-[10%] right-[10%] h-0.5 bg-slate-800 z-0"></div>
+            
+            {t.pipeline.steps.map((step, i) => {
+              const icons = [Cpu, Layers, Settings, Target];
+              const StepIcon = icons[i];
+              return (
+                <div key={i} className="relative z-10 flex flex-col items-center text-center">
+                  <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-slate-950 border-4 border-[#0a0f1c] shadow-[0_0_0_2px_rgba(30,41,59,1)] flex items-center justify-center mb-4 md:mb-6 group hover:shadow-[0_0_0_2px_rgba(34,197,94,0.5)] transition-all">
+                    <StepIcon size={28} className="text-slate-400 group-hover:text-green-400 transition-colors md:w-8 md:h-8" />
+                  </div>
+                  <div className="text-green-500 font-mono text-[10px] md:text-xs uppercase mb-2 md:mb-3">FAZ 0{i+1}</div>
+                  <h4 className="text-white font-bold text-base md:text-lg mb-2 md:mb-3">{step.title}</h4>
+                  <p className="text-slate-500 text-xs md:text-sm leading-relaxed max-w-xs">{step.desc}</p>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* FOCUS: EXHIBITION & PROMO */}
+      <section id="fuar" className="py-24 md:py-32">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="grid lg:grid-cols-2 gap-8">
+            {/* Fuar Box */}
+            <div className="bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 rounded-3xl p-8 md:p-14 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
+                <Award size={100} className="md:w-[120px] md:h-[120px]" />
+              </div>
+              <div className="relative z-10">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-green-500/10 text-green-400 rounded text-[10px] md:text-xs font-bold font-mono mb-6 md:mb-8 uppercase tracking-widest">
+                  {t.bento.fuar.tag}
+                </div>
+                <h3 className="text-2xl md:text-4xl font-black text-white mb-4 md:mb-6 leading-tight">
+                  {t.bento.fuar.title}
+                </h3>
+                <p className="text-sm md:text-base text-slate-400 mb-6 md:mb-8 leading-relaxed">
+                  {t.bento.fuar.desc}
+                </p>
+                <ul className="space-y-3 mb-8 md:mb-10">
+                  {t.bento.fuar.items.map((item, i) => (
+                    <li key={i} className="flex items-start md:items-center gap-3 text-xs md:text-sm text-slate-300 font-medium">
+                      <CheckCircle2 size={16} className="text-green-500 shrink-0 mt-0.5 md:mt-0" /> {item}
+                    </li>
+                  ))}
+                </ul>
+                <button className="flex items-center gap-2 text-green-400 font-bold uppercase tracking-widest text-xs md:text-sm hover:text-green-300 transition-colors">
+                  {t.bento.fuar.link} <ChevronRight size={16} className="md:w-[18px] md:h-[18px]" />
+                </button>
+              </div>
+            </div>
+
+            {/* Promo Box */}
+            <div className="bg-gradient-to-br from-[#0a0f1c] to-slate-900 border border-slate-800 rounded-3xl p-8 md:p-14 relative overflow-hidden group">
+               <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
+                <Box size={100} className="md:w-[120px] md:h-[120px]" />
+              </div>
+              <div className="relative z-10">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded text-[10px] md:text-xs font-bold font-mono mb-6 md:mb-8 uppercase tracking-widest">
+                  {t.bento.promo.tag}
+                </div>
+                <h3 className="text-2xl md:text-4xl font-black text-white mb-4 md:mb-6 leading-tight">
+                  {t.bento.promo.title}
+                </h3>
+                <p className="text-sm md:text-base text-slate-400 mb-6 md:mb-8 leading-relaxed">
+                  {t.bento.promo.desc}
+                </p>
+                <ul className="space-y-3 mb-8 md:mb-10">
+                  {t.bento.promo.items.map((item, i) => (
+                    <li key={i} className="flex items-start md:items-center gap-3 text-xs md:text-sm text-slate-300 font-medium">
+                      <CheckCircle2 size={16} className="text-emerald-500 shrink-0 mt-0.5 md:mt-0" /> {item}
+                    </li>
+                  ))}
+                </ul>
+                <button className="flex items-center gap-2 text-emerald-400 font-bold uppercase tracking-widest text-xs md:text-sm hover:text-emerald-300 transition-colors">
+                  {t.bento.promo.link} <ChevronRight size={16} className="md:w-[18px] md:h-[18px]" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* WHY US SECTION */}
+      <section className="py-24 bg-[#070B14] relative overflow-hidden border-t border-slate-900">
+        <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-green-900/10 to-transparent pointer-events-none"></div>
+        <div className="absolute bottom-[-10%] left-[-10%] w-[300px] h-[300px] md:w-[500px] md:h-[500px] bg-emerald-600/5 blur-[80px] md:blur-[100px] rounded-full pointer-events-none"></div>
+
+        <div className="container mx-auto px-4 md:px-6 relative z-10">
+          <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start lg:items-end mb-12 md:mb-16">
+            <div className="lg:w-1/2">
+              <h3 className="text-green-500 font-mono text-xs md:text-sm tracking-[0.3em] uppercase mb-3 md:mb-4 flex items-center gap-3">
+                <Target size={16} /> {t.whyUs.tag}
+              </h3>
+              <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight">{t.whyUs.title}</h2>
+            </div>
+            <div className="lg:w-1/2 text-sm md:text-base text-slate-400 leading-relaxed border-l-2 border-slate-800 pl-4 md:pl-6">
+              {lang === 'tr' 
+                ? 'Sadece bir maket üreticisi değil, projelerinizin lansman sürecindeki en güvenilir mühendislik ve stratejik partneriniziz.' 
+                : 'We are not just a scale model manufacturer; we are your most reliable engineering and strategic partner during your launch processes.'}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            {t.whyUs.cards.map((card, idx) => {
+              const icons = [Lock, Crosshair, Layers, Clock];
+              const CardIcon = icons[idx];
+              return (
+                <div key={idx} className="bg-[#0a0f1c] border border-slate-800/60 hover:border-green-500/50 rounded-2xl p-6 md:p-8 transition-all duration-300 group hover:-translate-y-2 shadow-lg hover:shadow-[0_10px_30px_rgba(34,197,94,0.1)] relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-24 h-24 md:w-32 md:h-32 bg-green-500/5 rounded-bl-full translate-x-12 -translate-y-12 md:translate-x-16 md:-translate-y-16 group-hover:bg-green-500/10 transition-colors"></div>
+                  
+                  <div className="w-12 h-12 md:w-14 md:h-14 bg-slate-900 border border-slate-800 rounded-xl flex items-center justify-center mb-4 md:mb-6 group-hover:border-green-500/30 transition-colors relative z-10">
+                    <CardIcon className="text-slate-400 group-hover:text-green-400 transition-colors w-6 h-6 md:w-7 md:h-7" />
+                  </div>
+                  
+                  <h4 className="text-lg md:text-xl font-bold text-white mb-3 md:mb-4 relative z-10">{card.title}</h4>
+                  <p className="text-xs md:text-sm text-slate-500 leading-relaxed relative z-10">{card.desc}</p>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ / SSS SECTION */}
+      <section id="sss" className="py-24 bg-slate-950 border-t border-slate-900">
+        <div className="container mx-auto px-4 md:px-6 max-w-6xl">
+          <div className="text-center mb-12 md:mb-16">
+            <h3 className="text-green-500 font-mono text-xs md:text-sm tracking-[0.3em] uppercase mb-3 md:mb-4">{t.faq.tag}</h3>
+            <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight">{t.faq.title}</h2>
+            <p className="text-sm md:text-base text-slate-400 mt-4 md:mt-6 max-w-2xl mx-auto leading-relaxed">
+              {lang === 'tr' 
+                ? '10 yılı aşkın sektörel deneyimimiz ve %100 müşteri memnuniyeti mottomuzla süreçlerimiz hakkında en çok merak edilen soruları yanıtladık.' 
+                : 'With over 10 years of sector experience and our 100% customer satisfaction motto, we have answered the most frequently asked questions about our processes.'}
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-3 md:gap-4 items-start">
+            {t.faq.items.map((faq, index) => (
+              <div 
+                key={index} 
+                className={`border rounded-xl overflow-hidden transition-all duration-300 ${activeFaq === index ? 'border-green-500/50 bg-slate-900 shadow-[0_0_15px_rgba(34,197,94,0.1)]' : 'border-slate-800 bg-[#0a0f1c] hover:border-slate-700'}`}
+              >
+                <button 
+                  className="w-full px-4 py-4 md:px-6 md:py-5 text-left flex justify-between items-center focus:outline-none"
+                  onClick={() => setActiveFaq(activeFaq === index ? null : index)}
+                >
+                  <div className="flex gap-3 md:gap-4 items-center">
+                    <span className="text-slate-700 font-mono text-xs hidden sm:block">{(index + 1).toString().padStart(2, '0')}</span>
+                    <span className={`font-bold text-sm md:text-base pr-2 md:pr-4 ${activeFaq === index ? 'text-green-400' : 'text-slate-300'}`}>{faq.q}</span>
+                  </div>
+                  <ChevronDown className={`shrink-0 transition-transform duration-300 ${activeFaq === index ? 'rotate-180 text-green-400' : 'text-slate-600'}`} size={18}/>
+                </button>
+                <div 
+                  className={`overflow-hidden transition-all duration-300 ${activeFaq === index ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}
+                >
+                  <div className="px-4 sm:px-6 pb-4 md:pb-6 text-slate-400 leading-relaxed text-xs md:text-sm sm:pl-12 md:sm:pl-14 border-t border-slate-800/50 mt-1 md:mt-2 pt-3 md:pt-4">
+                    {faq.a}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ULTRA CTA SECTION */}
+      <section className="py-24 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[300px] md:max-w-5xl h-[200px] md:h-[300px] bg-green-600/20 blur-[100px] md:blur-[150px] rounded-full pointer-events-none"></div>
+
+        <div className="container mx-auto px-4 md:px-6 relative z-10">
+          <div className="bg-slate-900/80 backdrop-blur-xl border border-green-500/30 rounded-3xl p-8 md:p-24 text-center shadow-[0_0_50px_rgba(34,197,94,0.1)]">
+            
+            <Target className="w-12 h-12 md:w-16 md:h-16 text-green-400 mx-auto mb-6 md:mb-8 opacity-80" />
+            <h2 className="text-3xl md:text-6xl font-black text-white mb-4 md:mb-6 uppercase tracking-tight">
+              {t.cta.title.split(' ')[0]} <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-600">{t.cta.title.split(' ').slice(1).join(' ')}</span>
+            </h2>
+            <p className="text-sm md:text-lg text-slate-400 mb-8 md:mb-12 max-w-2xl mx-auto leading-relaxed">
+              {t.cta.desc}
+            </p>
+            
+            <div className="flex flex-col sm:flex-row justify-center items-center gap-4 md:gap-6">
+              <button 
+                onClick={() => setIsQuoteModalOpen(true)}
+                className="w-full sm:w-auto px-8 md:px-12 py-4 md:py-5 bg-green-500 text-[#070B14] rounded-lg font-black text-xs md:text-sm uppercase tracking-widest hover:bg-green-400 transition-all shadow-[0_0_30px_rgba(34,197,94,0.3)] hover:scale-105"
+              >
+                {t.cta.btn1}
+              </button>
+              <button className="w-full sm:w-auto px-8 md:px-12 py-4 md:py-5 bg-transparent text-white border border-slate-600 rounded-lg font-bold text-xs md:text-sm uppercase tracking-widest hover:bg-slate-800 hover:border-green-500 transition-all">
+                {t.cta.btn2}
+              </button>
+            </div>
+            
+            <div className="mt-8 md:mt-12 flex justify-center items-center gap-3 md:gap-8 text-[10px] md:text-xs font-mono text-slate-500 uppercase tracking-widest text-center flex-wrap">
+              <span>{t.cta.footer[0]}</span>
+              <span className="hidden md:block w-1.5 h-1.5 bg-slate-700 rounded-full"></span>
+              <span>{t.cta.footer[1]}</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="bg-[#04070a] pt-16 md:pt-20 pb-8 md:pb-10 border-t border-slate-900">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-12 mb-12 md:mb-16">
+            <div className="col-span-1 lg:col-span-1">
+              <div className="flex items-center gap-3 mb-4 md:mb-6">
+                <span className="text-2xl md:text-3xl font-black tracking-tight text-white leading-none">OnScala.</span>
+              </div>
+              <p className="text-slate-500 mb-6 leading-relaxed text-xs md:text-sm">
+                {t.footer.desc}
+              </p>
+            </div>
+            
+            <div>
+              <h4 className="font-bold text-slate-300 mb-4 md:mb-6 uppercase tracking-widest text-xs">{t.footer.col1}</h4>
+              <ul className="space-y-2 md:space-y-3 text-slate-500 font-medium text-xs md:text-sm">
+                <li><a href="#" className="hover:text-green-400 transition-colors">Havacılık ve Uzay</a></li>
+                <li><a href="#" className="hover:text-green-400 transition-colors">Deniz Sistemleri</a></li>
+                <li><a href="#" className="hover:text-green-400 transition-colors">Kara ve Zırhlı Araçlar</a></li>
+                <li><a href="#" className="hover:text-green-400 transition-colors">Silah ve Mühimmat Modelleri</a></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-bold text-slate-300 mb-4 md:mb-6 uppercase tracking-widest text-xs">{t.footer.col2}</h4>
+              <ul className="space-y-2 md:space-y-3 text-slate-500 font-medium text-xs md:text-sm">
+                <li><a href="#" className="hover:text-green-400 transition-colors">Hakkımızda & Vizyon</a></li>
+                <li><a href="#referanslar" className="hover:text-green-400 transition-colors">Referanslar & Projeler</a></li>
+                <li><a href="#" className="hover:text-green-400 transition-colors">Üretim Teknolojilerimiz</a></li>
+                <li><a href="#sss" className="hover:text-green-400 transition-colors">KVKK, NDA & SSS</a></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-bold text-slate-300 mb-4 md:mb-6 uppercase tracking-widest text-xs">{t.footer.col3}</h4>
+              <p className="text-slate-500 text-xs md:text-sm mb-3 md:mb-4 leading-relaxed">info@onscala.com</p>
+              <a href="mailto:info@onscala.com" className="inline-flex items-center gap-2 text-green-400 hover:text-green-300 transition-colors font-mono text-xs md:text-sm px-3 md:px-4 py-2 bg-green-950/30 border border-green-900/50 rounded">
+                E-Posta Gönder <ArrowRight size={12} className="md:w-3.5 md:h-3.5" />
+              </a>
+            </div>
+          </div>
+          
+          <div className="pt-6 md:pt-8 border-t border-slate-900 flex flex-col md:flex-row justify-between items-center gap-4 text-[8px] md:text-[10px] text-slate-600 font-mono uppercase tracking-[0.2em] text-center md:text-left">
+            <p>{t.footer.rights}</p>
+            <div className="flex gap-6">
+              <span className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div> SİSTEM NORMAL</span>
+            </div>
+          </div>
+        </div>
+      </footer>
+
+      {/* QUOTE FORM MODAL */}
+      {isQuoteModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-[#070B14]/80 backdrop-blur-md overflow-y-auto">
+          <div 
+            className="bg-[#0a0f1c] border border-green-500/30 rounded-3xl w-full max-w-3xl relative overflow-hidden shadow-[0_0_50px_rgba(34,197,94,0.15)] my-auto animate-in fade-in zoom-in-95 duration-300"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="bg-slate-900 border-b border-slate-800 px-6 py-5 md:px-10 md:py-8 flex justify-between items-start">
+              <div>
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-green-500/10 text-green-400 rounded text-[10px] font-bold font-mono mb-3 uppercase tracking-widest">
+                  <Target size={12} /> SECURE CHANNEL
+                </div>
+                <h2 className="text-2xl md:text-3xl font-black text-white tracking-tight">{t.quoteForm.title}</h2>
+                <p className="text-slate-400 text-xs md:text-sm mt-2 max-w-xl">{t.quoteForm.subtitle}</p>
+              </div>
+              <button 
+                onClick={() => setIsQuoteModalOpen(false)}
+                className="text-slate-500 hover:text-white p-2 hover:bg-slate-800 rounded-lg transition-colors"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            {/* Modal Body / Form */}
+            <form className="p-6 md:p-10" onSubmit={(e) => { e.preventDefault(); /* API Call Here */ setIsQuoteModalOpen(false); }}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6 mb-8">
+                
+                <div className="flex flex-col gap-2">
+                  <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">{t.quoteForm.name} *</label>
+                  <input type="text" required className="bg-slate-900/50 border border-slate-800 text-white text-sm rounded-lg px-4 py-3 outline-none focus:border-green-500 focus:bg-slate-900 transition-all placeholder:text-slate-600" placeholder="John Doe" />
+                </div>
+                
+                <div className="flex flex-col gap-2">
+                  <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">{t.quoteForm.company} *</label>
+                  <input type="text" required className="bg-slate-900/50 border border-slate-800 text-white text-sm rounded-lg px-4 py-3 outline-none focus:border-green-500 focus:bg-slate-900 transition-all placeholder:text-slate-600" placeholder="Defense Corp." />
+                </div>
+                
+                <div className="flex flex-col gap-2">
+                  <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">{t.quoteForm.email} *</label>
+                  <input type="email" required className="bg-slate-900/50 border border-slate-800 text-white text-sm rounded-lg px-4 py-3 outline-none focus:border-green-500 focus:bg-slate-900 transition-all placeholder:text-slate-600" placeholder="john@company.com" />
+                </div>
+                
+                <div className="flex flex-col gap-2">
+                  <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">{t.quoteForm.phone}</label>
+                  <input type="tel" className="bg-slate-900/50 border border-slate-800 text-white text-sm rounded-lg px-4 py-3 outline-none focus:border-green-500 focus:bg-slate-900 transition-all placeholder:text-slate-600" placeholder="+90 555 000 0000" />
+                </div>
+
+                <div className="flex flex-col gap-2 md:col-span-2">
+                  <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">{t.quoteForm.projectType} *</label>
+                  <select required className="bg-slate-900/50 border border-slate-800 text-white text-sm rounded-lg px-4 py-3 outline-none focus:border-green-500 focus:bg-slate-900 transition-all appearance-none">
+                    <option value="" disabled selected className="text-slate-600">-- {lang === 'tr' ? 'Seçiniz' : 'Select'} --</option>
+                    {t.quoteForm.types.map((type, i) => (
+                      <option key={i} value={type}>{type}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex flex-col gap-2 md:col-span-2">
+                  <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">{t.quoteForm.details} *</label>
+                  <textarea required rows="4" className="bg-slate-900/50 border border-slate-800 text-white text-sm rounded-lg px-4 py-3 outline-none focus:border-green-500 focus:bg-slate-900 transition-all placeholder:text-slate-600 resize-none" placeholder={lang === 'tr' ? 'Lütfen üretilmesini istediğiniz platformu ve yaklaşık ebatlarını belirtiniz...' : 'Please specify the platform you want produced and its approximate dimensions...'}></textarea>
+                </div>
+              </div>
+
+              {/* Checkboxes: KVKK & NDA */}
+              <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-5 md:p-6 mb-8 flex flex-col gap-4">
+                <label className="flex items-start gap-3 cursor-pointer group">
+                  <div className="relative flex items-center justify-center mt-0.5">
+                    <input type="checkbox" required className="peer appearance-none w-5 h-5 border-2 border-slate-600 rounded bg-[#0a0f1c] checked:bg-green-500 checked:border-green-500 transition-all cursor-pointer" />
+                    <CheckCircle2 size={14} className="absolute text-[#070B14] opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" strokeWidth={3} />
+                  </div>
+                  <span className="text-xs md:text-sm text-slate-400 group-hover:text-slate-300 transition-colors leading-relaxed select-none">{t.quoteForm.nda}</span>
+                </label>
+                
+                <label className="flex items-start gap-3 cursor-pointer group">
+                  <div className="relative flex items-center justify-center mt-0.5">
+                    <input type="checkbox" required className="peer appearance-none w-5 h-5 border-2 border-slate-600 rounded bg-[#0a0f1c] checked:bg-green-500 checked:border-green-500 transition-all cursor-pointer" />
+                    <CheckCircle2 size={14} className="absolute text-[#070B14] opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" strokeWidth={3} />
+                  </div>
+                  <span className="text-xs md:text-sm text-slate-400 group-hover:text-slate-300 transition-colors leading-relaxed select-none">
+                    {t.quoteForm.kvkk}
+                  </span>
+                </label>
+              </div>
+
+              {/* Actions */}
+              <div className="flex flex-col-reverse sm:flex-row justify-end items-center gap-4">
+                <button 
+                  type="button"
+                  onClick={() => setIsQuoteModalOpen(false)}
+                  className="w-full sm:w-auto px-6 py-3.5 text-slate-400 font-bold text-xs uppercase tracking-widest hover:text-white transition-colors"
+                >
+                  {t.quoteForm.cancel}
+                </button>
+                <button 
+                  type="submit"
+                  className="w-full sm:w-auto px-8 py-3.5 bg-green-500 text-[#070B14] rounded-lg font-black text-xs uppercase tracking-widest hover:bg-green-400 transition-all shadow-[0_0_20px_rgba(34,197,94,0.3)] hover:scale-105"
+                >
+                  {t.quoteForm.submit}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes scan {
+          0% { top: 0; opacity: 0; }
+          10% { opacity: 1; }
+          90% { opacity: 1; }
+          100% { top: 100%; opacity: 0; }
+        }
+        .animate-scan {
+          animation: scan 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+        @keyframes marquee {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        .animate-marquee {
+          animation: marquee 20s linear infinite;
+        }
+        html {
+          scroll-behavior: smooth;
+        }
+      `}} />
+    </div>
+  );
+};
+
+export default App;
